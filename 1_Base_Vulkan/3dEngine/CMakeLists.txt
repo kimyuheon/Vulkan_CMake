@@ -33,10 +33,15 @@ if(WIN32)
     set(VULKAN_INCLUDE "Include")
 elseif(APPLE)
     # macOS Homebrew로 설치 시 (일반적인 설치 경로)
-    set(VULKAN_SDK_PATH "/opt/homebrew") # Homebrew prefix
-    set(VULKAN_INCLUDE "Include")
+    set(VULKAN_SDK_PATH "../VulkanSdk/Apple") # Homebrew prefix
+    set(VULKAN_INCLUDE "include")
     # 또는 수동 설치 시:
     # set(VULKAN_SDK_PATH "/Users/youruser/VulkanSDK/1.3.283.0") # <-- 본인 SDK 버전에 맞게 수정
+    if(EXISTS "${VULKAN_SDK_PATH}/MoltenVK")
+        set(MOLTENVK_PATH "${VULKAN_SDK_PATH}/MoltenVK")
+    else()
+        set(MOLTENVK_PATH "${VULKAN_SDK_PATH}")
+    endif()
 elseif(UNIX) # Linux
     # Linux 예시 (배포판 패키지 또는 수동 설치 경로)
     set(VULKAN_SDK_PATH "../VulkanSdk/Linux") # 시스템 설치 경로
@@ -140,7 +145,7 @@ if(WIN32)
 elseif(APPLE)
     # macOS용 GLFW 경로
     # 예: /opt/homebrew/Cellar/glfw/3.4 (Homebrew 설치 시) 또는 수동 설치 경로
-    set(GLFW_ROOT_DIR "/opt/homebrew/Cellar/glfw/3.4") # 또는 당신의 macOS GLFW 경로
+    set(GLFW_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../VulkanSdk/Apple/GLFW") # 또는 당신의 macOS GLFW 경로
     set(GLFW_LIB_DIR "lib") # macOS 라이브러리 폴더 (일반적으로)
     set(GLFW_STATIC_LIB_NAME "glfw3") # macOS 정적 라이브러리 이름 (libglfw3.a)
     set(GLFW_DEBUG_LIB_NAME "glfw3") # macOS는 보통 Debug/Release 구분 없이 동일한 정적 라이브러리 사용
@@ -209,7 +214,7 @@ if(WIN32)
     set(GLM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../VulkanSdk/Win/Include/glm")
     include_directories(${GLM_INCLUDE_DIR})
 elseif(APPLE) #APPLE
-    set(GLM_INCLUDE_DIR "/opt/homebrew/Cellar/glm")
+    set(GLM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../VulkanSdk/Apple/include/glm")
     include_directories(${GLM_INCLUDE_DIR})
 elseif(UNIX) # Linux
     set(GLM_INCLUDE_DIR "../VulkanSdk/Linux/include/glm")
