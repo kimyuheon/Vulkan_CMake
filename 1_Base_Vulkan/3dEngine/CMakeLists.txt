@@ -247,7 +247,7 @@ else()
     find_program(GLSLANG_VALIDATOR NAMES glslangValidator
                  PATHS "${VULKAN_SDK_PATH}/Bin" # Windows
                        "${VULKAN_SDK_PATH}/bin" # Linux
-                       "${VULKAN_SDK_PATH}/macOS/bin" # macOS
+                       "${VULKAN_SDK_PATH}/bin" # macOS
                  NO_DEFAULT_PATH)
 
     if(GLSLANG_VALIDATOR)
