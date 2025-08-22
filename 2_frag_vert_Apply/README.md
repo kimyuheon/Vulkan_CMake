@@ -57,6 +57,8 @@ Tool : Visual Studio Code
 
 > **참고**: VulkanSdk는 프로젝트 폴더와 같은 레벨에 위치하며, CMakeLists.txt에서 `../VulkanSdk/Win(Linux/Apple)/` 경로로 OS별 참조됩니다.
 
-- 윈도우
+- 실행결과
   
-  <img width="1244" height="636" alt="Image" src="https://github.com/user-attachments/assets/b411e6c8-5cb1-4a57-af62-034f12c1dc07" />
+  - 윈도우
+  
+    <img width="1244" height="636" alt="Image" src="https://github.com/user-attachments/assets/b411e6c8-5cb1-4a57-af62-034f12c1dc07" />
