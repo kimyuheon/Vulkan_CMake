@@ -68,10 +68,10 @@ Tool : Visual Studio Code
         libc++abi: terminating due to uncaught exception of type std::runtime_error: validation layers requested, but not available!  
       - 실행방법 1 (환경변수 설정 후 실행)  
         <kbd>???@MacBookPro build % </kbd> export VK_LAYER_PATH="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/explicit_layer.d"          
-        ???@MacBookPro build % export   VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
-        ???@MacBookPro build % ./VulkanApp
+        <kbd>???@MacBookPro build % </kbd> export   VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
+        <kbd>???@MacBookPro build % </kbd> ./VulkanApp
         
       - 실행방법 2 (바로 실행)  
-        ???@MacBookPro build % ./VulkanApp
+        <kbd>???@MacBookPro build % </kbd> ./VulkanApp
 
       <img width="1127" height="623" alt="Image" src="https://github.com/user-attachments/assets/f8913c8c-836a-43b1-8706-223a60e5b47b" />
