@@ -71,7 +71,7 @@ Tool : Visual Studio Code
         ???@MacBookPro build % export   VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
         ???@MacBookPro build % ./VulkanApp
         
-      - 실행방법 2 (바로 실행)
+      - 실행방법 2 (바로 실행)  
         ???@MacBookPro build % ./VulkanApp
 
       <img width="2509" height="1259" alt="Image" src="https://github.com/user-attachments/assets/e21e8ccc-c18a-4875-9d4c-11aa404bc3a9" />
