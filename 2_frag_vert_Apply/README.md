@@ -67,7 +67,7 @@ Tool : Visual Studio Code
       - 검증 레이어 오류시 1번 수행
         libc++abi: terminating due to uncaught exception of type std::runtime_error: validation layers requested, but not available!  
       - 실행방법 1 (환경변수 설정 후 실행)  
-        ![red]빨간 텍스트  
+        [!WARNING]빨간 텍스트  
         ???@MacBookPro build % export VK_LAYER_PATH="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/explicit_layer.d"          
         ???@MacBookPro build % export   VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
         ???@MacBookPro build % ./VulkanApp
