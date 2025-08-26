@@ -74,4 +74,4 @@ Tool : Visual Studio Code
       - 실행방법 2 (바로 실행)  
         ???@MacBookPro build % ./VulkanApp
 
-      <img width="1157" height="625" alt="Image" src="https://github.com/user-attachments/assets/de1955ff-f619-40d2-b822-fac155544221" />
+      <img width="1127" height="623" alt="Image" src="https://github.com/user-attachments/assets/f8913c8c-836a-43b1-8706-223a60e5b47b" />
