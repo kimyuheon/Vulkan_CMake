@@ -64,7 +64,7 @@ Tool : Visual Studio Code
     <img width="1244" height="636" alt="Image" src="https://github.com/user-attachments/assets/b411e6c8-5cb1-4a57-af62-034f12c1dc07" />
 
   - MacOS
-      - 검증 레이어 오류시 1번 수행
+      - 검증 레이어 오류시 1번 수행  
         libc++abi: terminating due to uncaught exception of type std::runtime_error: validation layers requested, but not available!  
       - 실행방법 1 (환경변수 설정 후 실행)  
         <kbd>???@MacBookPro build % </kbd> export VK_LAYER_PATH="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/explicit_layer.d"          
