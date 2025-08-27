@@ -76,7 +76,7 @@ Tool : Visual Studio Code
 
     <img width="1127" height="623" alt="Image" src="https://github.com/user-attachments/assets/f8913c8c-836a-43b1-8706-223a60e5b47b" />
 
-    - Linux(Ubuntu)
+  - Linux(Ubuntu)
       - 검증 레이어(validation layers) 오류시 1번 수행  
         terminate called after throwing an instance of 'std::runtime_error' what():  validation layers requested, but not available!  
       - 실행방법 1 (환경변수 설정 후 실행)  
