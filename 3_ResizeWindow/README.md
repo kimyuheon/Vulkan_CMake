@@ -1,4 +1,4 @@
-# Vulkan(frag + vert)
+# Vulkan(ResizeWindow)
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -60,11 +60,13 @@ Tool : Visual Studio Code
 - 실행결과
   
   - 윈도우  
-      - 실행방법  
+      - 실행방법(실행 후 윈도우 크기 변경하)  
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-    <img width="1244" height="636" alt="Image" src="https://github.com/user-attachments/assets/b411e6c8-5cb1-4a57-af62-034f12c1dc07" />  
+    <img width="1238" height="629" alt="Image" src="https://github.com/user-attachments/assets/09aa8d96-39d8-4c42-8002-6e4ec59c2a53" />  
+    <img width="1238" height="629" alt="Image" src="https://github.com/user-attachments/assets/54fc1242-8596-4139-bfaa-ba42500d89d3" />
+    <img width="1450" height="817" alt="Image" src="https://github.com/user-attachments/assets/e91de7c2-6d35-4955-af69-806263ca3be6" />  
     
   - MacOS
       - 검증 레이어(validation layers) 오류시 1번 수행  
