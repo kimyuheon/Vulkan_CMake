@@ -79,7 +79,7 @@ Tool : Visual Studio Code
   - Linux(Ubuntu)
       - 검증 레이어(validation layers) 오류시 1번 수행  
         terminate called after throwing an instance of 'std::runtime_error' what():  validation layers requested, but not available!  
-      - 실행방법 1 (환경변수 설정 후 실행)  
+      - 실행방법 1 (환경변수 설정 후 실행)   
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export VK_LAYER_PATH="/home/lot700/Vulkan/VulkanSdk/Linux/share/vulkan/explicit_layer.d"          
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export LD_LIBRARY_PATH="/home/lot700/Vulkan/VulkanSdk/Linux/lib:$LD_LIBRARY_PATH"  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp
