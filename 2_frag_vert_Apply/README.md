@@ -59,7 +59,10 @@ Tool : Visual Studio Code
 
 - 실행결과
   
-  - 윈도우
+  - 윈도우  
+      - 실행방법  
+        <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
+        <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe  
   
     <img width="1244" height="636" alt="Image" src="https://github.com/user-attachments/assets/b411e6c8-5cb1-4a57-af62-034f12c1dc07" />
 
@@ -72,7 +75,7 @@ Tool : Visual Studio Code
         <kbd>test@MacBookPro build % </kbd> ./VulkanApp
         
       - 실행방법 2 (바로 실행)  
-        <kbd>???@MacBookPro build % </kbd> ./VulkanApp  
+        <kbd>test@MacBookPro build % </kbd> ./VulkanApp  
 
     <img width="1127" height="623" alt="Image" src="https://github.com/user-attachments/assets/f8913c8c-836a-43b1-8706-223a60e5b47b" />
 
