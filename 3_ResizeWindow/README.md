@@ -60,7 +60,7 @@ Tool : Visual Studio Code
 - 실행결과
   
   - 윈도우  
-      - 실행방법(실행 후 윈도우 크기 변경하)  
+      - 실행방법(실행 후 윈도우 크기 변경하기)  
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
