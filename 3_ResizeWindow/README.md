@@ -70,7 +70,7 @@ Tool : Visual Studio Code
           
     
   - MacOS
-      - 실행방법
+      - 실행방법  
         <kbd>test@MacBookPro build % </kbd> ./VulkanApp  
       - 검증 레이어(validation layers) 오류시 아래의 해결방법 수행  
         libc++abi: terminating due to uncaught exception of type std::runtime_error: validation layers requested, but not available!  
