@@ -74,7 +74,7 @@ Tool : Visual Studio Code
       - 실행방법 2 (바로 실행)  
         <kbd>???@MacBookPro build % </kbd> ./VulkanApp
 
-      <img width="1127" height="623" alt="Image" src="https://github.com/user-attachments/assets/f8913c8c-836a-43b1-8706-223a60e5b47b" />
+    <img width="1127" height="623" alt="Image" src="https://github.com/user-attachments/assets/f8913c8c-836a-43b1-8706-223a60e5b47b" />
 
     - Linux(Ubuntu)
       - 검증 레이어(validation layers) 오류시 1번 수행  
@@ -87,4 +87,4 @@ Tool : Visual Studio Code
       - 실행방법 2 (바로 실행)  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp
 
-      <img width="1346" height="986" alt="Image" src="https://github.com/user-attachments/assets/7592e9d0-69ba-4adc-bd5b-9ce058da9eec" />
+    <img width="1346" height="986" alt="Image" src="https://github.com/user-attachments/assets/7592e9d0-69ba-4adc-bd5b-9ce058da9eec" />
