@@ -64,14 +64,27 @@ Tool : Visual Studio Code
     <img width="1244" height="636" alt="Image" src="https://github.com/user-attachments/assets/b411e6c8-5cb1-4a57-af62-034f12c1dc07" />
 
   - MacOS
-      - 검증 레이어 오류시 1번 수행  
+      - 검증 레이어(validation layers) 오류시 1번 수행  
         libc++abi: terminating due to uncaught exception of type std::runtime_error: validation layers requested, but not available!  
       - 실행방법 1 (환경변수 설정 후 실행)  
-        <kbd>???@MacBookPro build % </kbd> export VK_LAYER_PATH="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/explicit_layer.d"          
-        <kbd>???@MacBookPro build % </kbd> export   VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
-        <kbd>???@MacBookPro build % </kbd> ./VulkanApp
+        <kbd>test@MacBookPro build % </kbd> export VK_LAYER_PATH="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/explicit_layer.d"          
+        <kbd>test@MacBookPro build % </kbd> export VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
+        <kbd>test@MacBookPro build % </kbd> ./VulkanApp
         
       - 실행방법 2 (바로 실행)  
         <kbd>???@MacBookPro build % </kbd> ./VulkanApp
 
       <img width="1127" height="623" alt="Image" src="https://github.com/user-attachments/assets/f8913c8c-836a-43b1-8706-223a60e5b47b" />
+
+    - Linux(Ubuntu)
+      - 검증 레이어(validation layers) 오류시 1번 수행  
+        terminate called after throwing an instance of 'std::runtime_error' what():  validation layers requested, but not available!  
+      - 실행방법 1 (환경변수 설정 후 실행)  
+        <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export VK_LAYER_PATH="/home/lot700/Vulkan/VulkanSdk/Linux/share/vulkan/explicit_layer.d"          
+        <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export LD_LIBRARY_PATH="/home/lot700/Vulkan/VulkanSdk/Linux/lib:$LD_LIBRARY_PATH"  
+        <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp
+        
+      - 실행방법 2 (바로 실행)  
+        <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp
+
+      <img width="1346" height="986" alt="Image" src="https://github.com/user-attachments/assets/7592e9d0-69ba-4adc-bd5b-9ce058da9eec" />
