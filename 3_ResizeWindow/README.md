@@ -86,15 +86,18 @@ Tool : Visual Studio Code
         <img width="1132" height="727" alt="Image" src="https://github.com/user-attachments/assets/65797a8e-b9b6-40a4-af73-d2239f9759dd" />  
 
   - Linux(Ubuntu)
-      - 검증 레이어(validation layers) 오류시 1번 수행  
+      - 실행방법  
+        <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp   
+      - 검증 레이어(validation layers) 오류시 해결방법 수행  
         terminate called after throwing an instance of 'std::runtime_error' what():  validation layers requested, but not available!  
-      - 실행방법 1 (환경변수 설정 후 실행)   
+      - 해결방법 (환경변수 설정 후 실행)   
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export VK_LAYER_PATH="/home/lot700/Vulkan/VulkanSdk/Linux/share/vulkan/explicit_layer.d"          
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export LD_LIBRARY_PATH="/home/lot700/Vulkan/VulkanSdk/Linux/lib:$LD_LIBRARY_PATH"  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export XDG_SESSION_TYPE=x11  // x11 창 선택  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp  
-        
-      - 실행방법 2 (바로 실행)  
-        <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp
 
-    <img width="1346" height="986" alt="Image" src="https://github.com/user-attachments/assets/7592e9d0-69ba-4adc-bd5b-9ce058da9eec" />
+        <img width="1206" height="879" alt="Image" src="https://github.com/user-attachments/assets/b66265bf-4ab9-4324-bb65-6d1258aaadfb" />
+
+        <img width="1206" height="879" alt="Image" src="https://github.com/user-attachments/assets/569bd893-6b56-4c80-b545-3bb7e0ea7838" />
+
+        <img width="1429" height="966" alt="Image" src="https://github.com/user-attachments/assets/ba651928-067a-4e45-9e49-d4936eb1a8b3" />
