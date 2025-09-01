@@ -79,12 +79,8 @@ Tool : Visual Studio Code
         <kbd>test@MacBookPro build % </kbd> export VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
         <kbd>test@MacBookPro build % </kbd> ./VulkanApp 
 
-        <img width="1052" height="626" alt="Image" src="https://github.com/user-attachments/assets/0aa4fe3f-e04f-4dc3-9abc-5b0810beda36" />
+        https://github.com/user-attachments/assets/84541847-5367-4a7f-aad9-b860cdf85b0c
         
-        <img width="936" height="609" alt="Image" src="https://github.com/user-attachments/assets/62cb72aa-ccde-4477-a62b-e7e15bfcf139" />  
-
-        <img width="1132" height="727" alt="Image" src="https://github.com/user-attachments/assets/65797a8e-b9b6-40a4-af73-d2239f9759dd" />  
-
   - Linux(Ubuntu)
       - 실행방법  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp   
