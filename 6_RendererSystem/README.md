@@ -64,7 +64,7 @@ Tool : Visual Studio Code
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/903b6312-f391-4f53-a927-ed68b821342c            
+        https://github.com/user-attachments/assets/98b3d0de-533d-41c0-8128-9e9e59887d2e            
     
   - MacOS
       - 실행방법  
