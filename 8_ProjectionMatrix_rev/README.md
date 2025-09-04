@@ -1,4 +1,4 @@
-# Vulkan(ProjectionMatrix)
+# Vulkan(ProjectionMatrix - 수정)
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -60,11 +60,11 @@ Tool : Visual Studio Code
 - 실행결과
   
   - 윈도우  
-      - 실행방법(실행 후 윈도우 크기 변경하기)  
+      - 실행방법(윈도우에서만 resizing 시 잔상 효과 있어서 수정)  
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/c53e7925-206d-46d8-a7f2-1156297830a3               
+        https://github.com/user-attachments/assets/27d7d710-0768-4f2b-8293-cd661e7a4629                
     
   - MacOS
       - 실행방법  
@@ -79,7 +79,7 @@ Tool : Visual Studio Code
         https://github.com/user-attachments/assets/7722422e-c9f5-428b-9c25-f5b4a5614c01   
         
   - Linux(Ubuntu)
-      - 실행방법  
+      - 실행방법(일부 수정 - vkDeviceWaitIdle(lotDevice.device()); 추가)  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp   
       - 검증 레이어(validation layers) 오류시 해결방법 수행  
         terminate called after throwing an instance of 'std::runtime_error' what():  validation layers requested, but not available!  
