@@ -1,4 +1,4 @@
-# Vulkan(UserInput)
+# Vulkan(Index and Staging Buffers - 정점 수 줄이기)
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -64,7 +64,7 @@ Tool : Visual Studio Code
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/44409cb6-44cf-4883-a435-513eee1c4783                
+        https://github.com/user-attachments/assets/9fa4a737-5a66-4ff9-9083-a85a33e661dc                  
     
   - MacOS
       - 실행방법  
