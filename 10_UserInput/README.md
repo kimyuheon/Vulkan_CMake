@@ -60,7 +60,7 @@ Tool : Visual Studio Code
 - 실행결과
   
   - 윈도우  
-      - 실행방법(윈도우에서만 resizing 시 잔상 효과 있어서 수정)  
+      - 실행방법    
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
