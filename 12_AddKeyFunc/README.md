@@ -1,4 +1,4 @@
-# Vulkan(AddKeyFunc - 객체 중심 회전 기능 추 - 숫자패드)
+# Vulkan(AddKeyFunc - 객체 중심 회전 기능 추가 - 숫자패드)
 
 Tool : Visual Studio Code
 - 파일 구조
