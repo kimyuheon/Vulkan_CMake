@@ -76,7 +76,7 @@ Tool : Visual Studio Code
         <kbd>test@MacBookPro build % </kbd> export VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
         <kbd>test@MacBookPro build % </kbd> ./VulkanApp 
 
-        https://github.com/user-attachments/assets/d2e4cf5c-896a-4f8d-81cb-783e11ddf242  
+        https://github.com/user-attachments/assets/066572fd-4c28-4066-8d5a-6ab9242a1cbc    
         
   - Linux(Ubuntu)
       - 실행방법(일부 수정 - vkDeviceWaitIdle(lotDevice.device()); 추가)  
