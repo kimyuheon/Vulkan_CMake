@@ -1,4 +1,4 @@
-# Vulkan(UserInput)
+# Vulkan(AddKeyFunc - 객체 중심 회전 기능 추 - 숫자패드)
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -64,7 +64,7 @@ Tool : Visual Studio Code
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/44409cb6-44cf-4883-a435-513eee1c4783                
+        https://github.com/user-attachments/assets/50f9b631-e7d0-45c3-8b63-b013718d3759                 
     
   - MacOS
       - 실행방법  
