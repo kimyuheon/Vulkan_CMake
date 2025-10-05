@@ -1,4 +1,4 @@
-# Vulkan(UserInput)
+# Vulkan(QuternionZ) - Z축 90도 이상 회전시 짐벌락 발생으로 쿼터니언으로 변경  
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -58,13 +58,15 @@ Tool : Visual Studio Code
 > **참고**: VulkanSdk는 프로젝트 폴더와 같은 레벨에 위치하며, CMakeLists.txt에서 `../VulkanSdk/Win(Linux/Apple)/` 경로로 OS별 참조됩니다.
 
 - 실행결과
-  
+  - 좌표계를 오일러에서 쿼터시안으로 변경
+  - 선택 시 노란색으로 객체 색상 변경  
+
   - 윈도우  
       - 실행방법    
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/44409cb6-44cf-4883-a435-513eee1c4783                
+        https://github.com/user-attachments/assets/9092bb01-8944-4e57-838a-3b7cee469703                
     
   - MacOS
       - 실행방법  
