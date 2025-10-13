@@ -96,7 +96,7 @@ Tool : Visual Studio Code
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export XDG_SESSION_TYPE=x11  // x11 창 선택  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp  
 
-        https://github.com/user-attachments/assets/14c7e23d-669c-49de-80d3-1258ea9e697a
+        https://github.com/user-attachments/assets/61519cc9-7a07-4327-a2b8-5ed4dbe76d5b  
         
 
         
