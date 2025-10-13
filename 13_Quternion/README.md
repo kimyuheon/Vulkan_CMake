@@ -59,7 +59,12 @@ Tool : Visual Studio Code
 
 - 실행결과
   - 좌표계를 오일러에서 쿼터시안으로 변경
-  - 선택 시 노란색으로 객체 색상 변경  
+  - 선택 시 노란색으로 객체 색상 변경
+  - 마우스 휠 버튼 : 줌 확대/축소
+  - 마우스 좌측 버튼 : 선택
+  - 마우스 우측 버튼 : 회전
+  - N : 랜덤생성
+  - Delete : 선택된 객체 삭제
 
   - 윈도우  
       - 실행방법    
@@ -78,7 +83,7 @@ Tool : Visual Studio Code
         <kbd>test@MacBookPro build % </kbd> export VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
         <kbd>test@MacBookPro build % </kbd> ./VulkanApp 
 
-        https://github.com/user-attachments/assets/d2e4cf5c-896a-4f8d-81cb-783e11ddf242  
+        https://github.com/user-attachments/assets/c7e9b9e4-c2a6-40f6-aa82-ec89dffecd34    
         
   - Linux(Ubuntu)
       - 실행방법(일부 수정 - vkDeviceWaitIdle(lotDevice.device()); 추가)  
