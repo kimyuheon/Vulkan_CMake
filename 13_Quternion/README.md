@@ -86,7 +86,7 @@ Tool : Visual Studio Code
         https://github.com/user-attachments/assets/c7e9b9e4-c2a6-40f6-aa82-ec89dffecd34    
         
   - Linux(Ubuntu)
-      - 실행방법(일부 수정 - vkDeviceWaitIdle(lotDevice.device()); 추가)  
+      - 실행방법(수정 - <kbd>ads(deltaX)</kbd>로 인해 정수값 인식으로 회전 불가 -> <kbd>std::abs(deltaX)</kbd>로 변경하여 double로 인식하도록 변경)  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp   
       - 검증 레이어(validation layers) 오류시 해결방법 수행  
         terminate called after throwing an instance of 'std::runtime_error' what():  validation layers requested, but not available!  
