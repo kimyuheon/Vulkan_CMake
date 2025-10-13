@@ -64,7 +64,7 @@ Tool : Visual Studio Code
   - 마우스 좌측 버튼 : 선택
   - 마우스 우측 버튼 : 회전
   - N : 랜덤생성
-  - Delete : 선택된 객체 삭제
+  - Delete : 선택된 객체 삭제  
     
   - 윈도우  
       - 실행방법    
