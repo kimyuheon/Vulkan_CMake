@@ -1,5 +1,4 @@
-# Vulkan(QuternionZ) - 
-Z축 90도 이상 회전시 짐벌락 발생으로 쿼터니언으로 변경  
+# Vulkan(QuternionZ) - Z축 90도 이상 회전시 짐벌락 발생으로 쿼터니언으로 변경  
 
 Tool : Visual Studio Code
 - 파일 구조
