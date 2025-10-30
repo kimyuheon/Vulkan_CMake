@@ -378,11 +378,11 @@ namespace lot {
 
     // 내부 헬퍼 함수
     void KeyboardMoveCtrl::handleKeyboardObjectControl(GLFWwindow* window, float dt, std::vector<LotGameObject>& gameObject) {
-        if (!hasValidObjectSelection || selectedObjectIndex >= gameObject.size()) {
-            return;
-        }
+        //if (!hasValidObjectSelection || selectedObjectIndex >= gameObject.size()) {
+        //    return;
+        //}
 
-        auto& selectedObject = gameObject[selectedObjectIndex];
+        //auto& selectedObject = gameObject[selectedObjectIndex];
         glm::vec3 rotationDelta{0.0f};        
 
         // 넘패드 입력으로 회전
@@ -407,11 +407,14 @@ namespace lot {
 
         // 회전 적용
         if (glm::dot(rotationDelta, rotationDelta) > std::numeric_limits<float>::epsilon()) {
-
-            // 회전값 정규화 (0 ~ 360)
-            if (rotationDelta.x != 0.0f) selectedObject.transform.rotateAroundAxis(rotationDelta.x, glm::vec3(1, 0, 0));
-            if (rotationDelta.y != 0.0f) selectedObject.transform.rotateAroundAxis(rotationDelta.y, glm::vec3(0, 1, 0));
-            if (rotationDelta.z != 0.0f) selectedObject.transform.rotateAroundAxis(rotationDelta.z, glm::vec3(0, 0, 1));
+            for (auto& obj : gameObject) {
+                if (obj.isSelected) {
+                    // 회전값 정규화 (0 ~ 360)
+                    if (rotationDelta.x != 0.0f) obj.transform.rotateAroundAxis(rotationDelta.x, glm::vec3(1, 0, 0));
+                    if (rotationDelta.y != 0.0f) obj.transform.rotateAroundAxis(rotationDelta.y, glm::vec3(0, 1, 0));
+                    if (rotationDelta.z != 0.0f) obj.transform.rotateAroundAxis(rotationDelta.z, glm::vec3(0, 0, 1));
+                }
+            }
         }        
     }
 
