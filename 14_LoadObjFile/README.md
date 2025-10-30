@@ -95,7 +95,7 @@ Tool : Visual Studio Code
         
   - Linux(Ubuntu)
       - 실행방법(일부 수정 - vkDeviceWaitIdle(lotDevice.device()); 추가)  
-        <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp   
+        <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./run_vulkan   
       - 검증 레이어(validation layers) 오류시 해결방법 수행  
         terminate called after throwing an instance of 'std::runtime_error' what():  validation layers requested, but not available!  
       - 해결방법 (환경변수 설정 후 실행)   
@@ -104,7 +104,7 @@ Tool : Visual Studio Code
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export XDG_SESSION_TYPE=x11  // x11 창 선택  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp  
 
-        https://github.com/user-attachments/assets/14c7e23d-669c-49de-80d3-1258ea9e697a
+        https://github.com/user-attachments/assets/8e102244-500b-4e25-af0d-11176ff5a601  
         
 
         
