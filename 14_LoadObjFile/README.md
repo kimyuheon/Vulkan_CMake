@@ -1,4 +1,4 @@
-# Vulkan(QuternionZ) - Z축 90도 이상 회전시 짐벌락 발생으로 쿼터니언으로 변경  
+# Vulkan(Obj 파일 로드) - TinyObjLoder.h 로 obj 파일 로드하기
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -17,6 +17,12 @@ Tool : Visual Studio Code
 │   ├── shaders/                    # 원본 셰이더 파일들
 │   │   ├── simple_shader.frag
 │   │   ├── simple_shader.vert
+│   │   └── ...
+│   ├── models/                    # .obj 파일들
+│   │   ├── smooth_vase.obj
+│   │   ├── cube.obj
+│   │   ├── colored_cube.obj
+│   │   ├── flat_vase.obj
 │   │   └── ...
 │   ├── CMakeLists.txt
 │   ├── README.md
@@ -54,6 +60,7 @@ Tool : Visual Studio Code
 | `VulkanSdk/Linux/` | Linux용 Vulkan SDK 및 라이브러리 |
 | `VulkanSdk/Apple/` | macOS용 Vulkan SDK 및 라이브러리 |
 | `lot_*.cpp/h` | Vulkan 엔진 컴포넌트들 |
+| `VulkanSdk/Apple,Win,Linux/tinyobjloader/.h` | tiny_obj_loader.h 헤더파일 |
 
 > **참고**: VulkanSdk는 프로젝트 폴더와 같은 레벨에 위치하며, CMakeLists.txt에서 `../VulkanSdk/Win(Linux/Apple)/` 경로로 OS별 참조됩니다.
 
@@ -65,13 +72,14 @@ Tool : Visual Studio Code
   - 마우스 우측 버튼 : 회전
   - N : 랜덤생성
   - Delete : 선택된 객체 삭제
+  - obj 확장자 파일 로드 
   ---  
   - 윈도우  
       - 실행방법    
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/9092bb01-8944-4e57-838a-3b7cee469703                
+        https://github.com/user-attachments/assets/5af2ab51-bea5-4c01-ab21-e9c39a58c44c                  
     
   - MacOS
       - 실행방법  
