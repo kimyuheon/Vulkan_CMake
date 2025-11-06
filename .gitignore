@@ -1,0 +1,24 @@
+# 빌드 폴더
+build/
+
+# VS Code 설정
+.vscode/
+
+# 컴파일된 셰이더 파일 (spv)
+*.spv
+shaders/*.spv
+
+# 기타 임시 파일
+*.exe
+*.dll
+*.so
+*.dylib
+
+# CMake 캐시
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# OS 관련
+.DS_Store
+Thumbs.db
