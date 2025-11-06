@@ -1,4 +1,4 @@
-# Vulkan(QuternionZ) - Z축 90도 이상 회전시 짐벌락 발생으로 쿼터니언으로 변경  
+# Vulkan(LightingOnoff) - 조명 추가  
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -36,10 +36,19 @@ Tool : Visual Studio Code
 ├── VulkanSdk/                      # Vulkan 라이브러리
 │   ├── Win/                        # Windows용 SDK
 │   │   └── glfw/
+│   │   └── Include/
+│   │       └── tinyobjloader/
+│   │           └── tiny_obj_loader.h
 │   ├── Linux/                      # Linux용 SDK
 │   │   └── glfw/
+│   │   └── include/
+│   │       └── tinyobjloader/
+│   │           └── tiny_obj_loader.h
 │   └── Apple/                      # macOS용 SDK
 │       └── glfw/
+│       └── include/
+│           └── tinyobjloader/
+│               └── tiny_obj_loader.h
 └── ...
 </pre>
 
@@ -65,17 +74,18 @@ Tool : Visual Studio Code
   - 마우스 우측 버튼 : 회전
   - N : 랜덤생성
   - Delete : 선택된 객체 삭제
+  - G : 조명 OnOff
   ---  
   - 윈도우  
       - 실행방법    
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/9092bb01-8944-4e57-838a-3b7cee469703                
+        https://github.com/user-attachments/assets/2fd84cf2-95cd-44db-a555-a4025853d2e5                  
     
   - MacOS
       - 실행방법  
-        <kbd>test@MacBookPro build % </kbd> ./VulkanApp  
+        <kbd>test@MacBookPro build % </kbd> ./run_vulkan.sh  
       - 검증 레이어(validation layers) 오류시 아래의 해결방법 수행  
         libc++abi: terminating due to uncaught exception of type std::runtime_error: validation layers requested, but not available!  
       - 해결방법 (환경변수 설정 후 실행)  
@@ -83,11 +93,11 @@ Tool : Visual Studio Code
         <kbd>test@MacBookPro build % </kbd> export VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
         <kbd>test@MacBookPro build % </kbd> ./VulkanApp 
 
-        https://github.com/user-attachments/assets/c7e9b9e4-c2a6-40f6-aa82-ec89dffecd34    
+        https://github.com/user-attachments/assets/95100851-6346-4fb1-af43-e2c039a7b177      
         
   - Linux(Ubuntu)
-      - 실행방법(일부 수정 - vkDeviceWaitIdle(lotDevice.device()); 추가)  
-        <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp   
+      - 실행방법  
+        <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./run_vulkan.sh   
       - 검증 레이어(validation layers) 오류시 해결방법 수행  
         terminate called after throwing an instance of 'std::runtime_error' what():  validation layers requested, but not available!  
       - 해결방법 (환경변수 설정 후 실행)   
@@ -96,6 +106,6 @@ Tool : Visual Studio Code
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export XDG_SESSION_TYPE=x11  // x11 창 선택  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp  
 
-        https://github.com/user-attachments/assets/14c7e23d-669c-49de-80d3-1258ea9e697a
+        https://github.com/user-attachments/assets/33b2caa5-bba1-4e84-baff-856ed92a2425  
         
 
