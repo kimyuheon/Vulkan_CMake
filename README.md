@@ -65,6 +65,7 @@ Tool : Visual Studio Code
 | `lot_*.cpp/h` | Vulkan 엔진 컴포넌트들 |
 
 > **Note**: VulkanSdk는 프로젝트 폴더와 같은 레벨에 위치하며, CMakeLists.txt에서 `../VulkanSdk/Win(Linux/Apple)/` 경로로 OS별 참조됩니다.
+
 > **추가**: tiny_obj_loader.h 를 위의 디렉토리를 보고 OS에 따라 복사해주세요.
 
 - 실행결과
