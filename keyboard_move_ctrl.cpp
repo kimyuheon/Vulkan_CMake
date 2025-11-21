@@ -387,10 +387,10 @@ namespace lot {
 
         // 넘패드 입력으로 회전
         if (glfwGetKey(window, keys.objRotateLeft) == GLFW_PRESS) { // Y축 왼쪽 회전
-            rotationDelta.y -= objectRotationSpeed * dt;
+            rotationDelta.y += objectRotationSpeed * dt;
         }
         if (glfwGetKey(window, keys.objRotateRight) == GLFW_PRESS) { // Y축 오른쪽 회전
-            rotationDelta.y += objectRotationSpeed * dt;
+            rotationDelta.y -= objectRotationSpeed * dt;
         }
         if (glfwGetKey(window, keys.objRotateUp) == GLFW_PRESS) { // Y축 위쪽 회전
             rotationDelta.x -= objectRotationSpeed * dt;

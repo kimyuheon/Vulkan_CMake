@@ -3,6 +3,8 @@
 #include "keyboard_move_ctrl.h"
 #include "lot_camera.h"
 #include "simple_render_system.h"
+#include "lot_buffer.h"
+#include "lot_descriptors.h"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -22,38 +24,85 @@
 #include <thread>
 
 namespace lot {
+    struct GlobalUbo {
+        glm::mat4 projectionView{1.f};
+        glm::vec4 ambientLightColor{1.f, 1.f, 1.f, .3f};
+        glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+        int lightingEnabled = 1;
+    };
     struct SimplePushConstantData {
-        glm::mat2 transform{1.f};
-        glm::vec2 offset;
-        alignas(16) glm::vec3 color;
+        glm::mat4 modelMatrix{1.f};
+        glm::mat4 normalMatrix{1.f};
+        alignas(16) glm::vec3 color{};
+        int isSelected{0};
     };
 
-    FirstApp::FirstApp() { loadGameObjects(); }
+    FirstApp::FirstApp() { 
+        loadGameObjects(); 
+
+        // DescriptorSetLayout
+        globalSetLayout = LotDescriptorSetLayout::Builder(lotDevice)
+        .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+        .build();
+
+        // Uniform Buffer
+        uboBuffers.resize(LotSwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i = 0; i < uboBuffers.size(); i++) {
+            uboBuffers[i] = std::make_unique<LotBuffer>(
+                lotDevice, sizeof(GlobalUbo), 1, 
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+            uboBuffers[i]->map();
+        }
+
+        // Descriptor Pool
+        globalPool = LotDescriptorPool::Builder(lotDevice)
+        .setMaxSets(LotSwapChain::MAX_FRAMES_IN_FLIGHT)
+        .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, LotSwapChain::MAX_FRAMES_IN_FLIGHT)
+        .build();
+
+        // Descriptor Sets
+        globalDescriptorSets.resize(LotSwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i = 0; i < globalDescriptorSets.size(); i++) {
+            auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            LotDescriptorWriter(*globalSetLayout, *globalPool)
+                .writeBuffer(0, &bufferInfo)
+                .build(globalDescriptorSets[i]);
+        }
+
+        // SimpleRenderSystem
+        simpleRenderSystem = std::make_unique<SimpleRenderSystem>(
+            lotDevice,
+            lotRenderer.getSwapChainRenderPass(),
+            globalSetLayout->getDescriptorSetLayout()
+        );
+    }
 
     FirstApp::~FirstApp() {
-        vkDeviceWaitIdle(lotDevice.device());
+        //vkDeviceWaitIdle(lotDevice.device());
     }
 
     void FirstApp::run() {
-        SimpleRenderSystem simpleRenderSystem{ lotDevice, lotRenderer.getSwapChainRenderPass() };
-        LotCamera camera{};
+        LotGameObject viewerObject = LotGameObject::createGameObject();
+        viewerObject.transform.translation.z = -2.5f; // 카메라 초기 위치 설정
 
-        auto viewerObject = LotGameObject::createGameObject();
-        viewerObject.transform.translation = {0.0f, 0.0f, 0.0f}; // 카메라 초기 위치 설정
         KeyboardMoveCtrl cameraCtrl{};
-        glm::vec3 orbitTarget{0.0f, 0.0f, 2.5f};
+        LotCamera camera{};
+        
+        auto projectionType = KeyboardMoveCtrl::ProjectionType::Perspective;
 
         // 마우스 휠 콜백 설정
-        auto projectionType = KeyboardMoveCtrl::ProjectionType::Perspective;
         KeyboardMoveCtrl::setInstance(&cameraCtrl);
         glfwSetScrollCallback(lotWindow.getGLFWwindow(), KeyboardMoveCtrl::scrollCallback);
         glfwSetCursorPosCallback(lotWindow.getGLFWwindow(), KeyboardMoveCtrl::mouseCallback);
-
+        
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        
         // 조명 토글 상태 추가
         bool enableLighting = true;
         bool gKeyPressed = false;
+        glm::vec3 orbitTarget{0.0f, 0.0f, 0.0f};
 
-        auto currentTime = std::chrono::high_resolution_clock::now();
         while (!lotWindow.shouldClose()) {
             glfwPollEvents();
 
@@ -73,8 +122,31 @@ namespace lot {
                 handleResizing();
                 continue;
             }
-            //std::cout << "render Lighting" << (enableLighting ? "Light On" : "Light Off") << std::endl;
-            render(simpleRenderSystem, camera, enableLighting);
+            
+            if (auto commandBuffer = lotRenderer.beginFrame()) {
+                int frameIndex = lotRenderer.getFrameIndex();
+
+                GlobalUbo ubo{};
+                ubo.projectionView = camera.getProjection() * camera.getView();
+                ubo.ambientLightColor = glm::vec4(1.f, 1.f, 1.f, .3f);
+                ubo.lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+                ubo.lightingEnabled = enableLighting ? 1 : 0;
+
+                uboBuffers[frameIndex]->writeToBuffer(&ubo);
+                uboBuffers[frameIndex]->flush();
+
+                FrameInfo frameInfo {
+                    frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex]
+                };
+
+                lotRenderer.beginSwapChainRenderPass(commandBuffer);
+
+                simpleRenderSystem->renderGameObjects(frameInfo, gameObjects);
+                simpleRenderSystem->renderHighlights(frameInfo, gameObjects);
+
+                lotRenderer.endSwapChainRenderPass(commandBuffer);
+                lotRenderer.endFrame();
+            }
         }
         vkDeviceWaitIdle(lotDevice.device());
     }
@@ -180,16 +252,6 @@ namespace lot {
 
         // 리사이징 중에는 더 자주 폴링
         std::this_thread::sleep_for(std::chrono::microseconds(500));
-    }
-
-    void FirstApp::render(SimpleRenderSystem& renderSystem, LotCamera& camera, bool enableLighting) {
-        if (auto commandBuffer = lotRenderer.beginFrame()) {
-            lotRenderer.beginSwapChainRenderPass(commandBuffer);
-            renderSystem.renderGameObjects(commandBuffer, gameObjects, camera, enableLighting);
-            renderSystem.renderHighlights(commandBuffer, gameObjects, camera, enableLighting);
-            lotRenderer.endSwapChainRenderPass(commandBuffer);
-            lotRenderer.endFrame();
-        }
     }
 
     void FirstApp::printDebugInfo(const std::chrono::high_resolution_clock::time_point& currentTime,

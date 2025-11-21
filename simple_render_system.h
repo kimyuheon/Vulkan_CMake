@@ -2,6 +2,7 @@
 
 #include "lot_camera.h"
 #include "lot_device.h"
+#include "lot_frame_info.h"
 #include "lot_game_object.h"
 #include "lot_pipeline.h"
 
@@ -12,18 +13,16 @@
 namespace lot {
     class SimpleRenderSystem {
         public:
-            SimpleRenderSystem(LotDevice &device, VkRenderPass renderPass);
+            SimpleRenderSystem(LotDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
             ~SimpleRenderSystem();
 
             SimpleRenderSystem(const SimpleRenderSystem &) = delete;
             SimpleRenderSystem& operator=(const SimpleRenderSystem &) = delete;
 
-            void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<LotGameObject> &gameObjects,
-                                   const LotCamera& camera, bool enableLighting = true);
-            void renderHighlights(VkCommandBuffer commandBuffer, std::vector<LotGameObject> &gameObjects,
-                                  const LotCamera& camera, bool enableLighting = true);
+            void renderGameObjects(FrameInfo &frameInfo, std::vector<LotGameObject> &gameObjects);
+            void renderHighlights(FrameInfo &frameInfo, std::vector<LotGameObject> &gameObjects);
         private:
-            void createPipelineLayout();
+            void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
             void createPipeline(VkRenderPass renderPass);
             void createHighlightPipeline(VkRenderPass renderPass);
 

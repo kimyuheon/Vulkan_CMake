@@ -8,6 +8,8 @@
 #include "keyboard_move_ctrl.h"
 #include "lot_camera.h"
 #include "simple_render_system.h"
+#include "lot_buffer.h"
+#include "lot_descriptors.h"
 
 #include <memory>
 #include <vector>
@@ -42,7 +44,7 @@ namespace lot {
                               bool& enableLighting, bool& gKeyPressed);
             void updateProjection(LotCamera& camera, KeyboardMoveCtrl::ProjectionType projectionType, float aspect, const LotGameObject& viewerObject, const glm::vec3& orbitTarget);
             void handleResizing();
-            void render(SimpleRenderSystem& renderSystem, LotCamera& camera, bool enableLighting);
+            //void render(SimpleRenderSystem& renderSystem, LotCamera& camera, bool enableLighting);
             void printDebugInfo(const std::chrono::high_resolution_clock::time_point& currentTime,
                                const LotGameObject& viewerObject, bool enableLighting);
 
@@ -50,6 +52,12 @@ namespace lot {
             LotDevice lotDevice{ lotWindow };
             LotRenderer lotRenderer{ lotWindow, lotDevice };
 
+            std::unique_ptr<LotDescriptorPool> globalPool{};
+            std::unique_ptr<LotDescriptorSetLayout> globalSetLayout{};
+            std::vector<std::unique_ptr<LotBuffer>> uboBuffers;
+            std::vector<VkDescriptorSet> globalDescriptorSets;
+
+            std::unique_ptr<SimpleRenderSystem> simpleRenderSystem;
             std::vector<LotGameObject> gameObjects;
             ObjectSelectionManager selectionManager;
     };

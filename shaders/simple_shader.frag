@@ -7,24 +7,28 @@ layout (location = 2) in vec3 fragNormalWorld;
 layout (location = 0) out vec4 outColor;
 
 layout(push_constant) uniform Push {
-    //mat4 transform;
     mat4 modelMatrix;
     mat4 normalMatrix;
-    vec3 color;  // C++의 구조체와 맞춰야 함 (사용하지 않아도 필요)
-    int isSelected;  // 선택 상태를 나타내는 플래그
-    int enableLighting;  // 조명 플래그 추가
+    vec3 color;
+    int isSelected;
 } push;
+
+layout(set = 0, binding = 0) uniform GlobalUbo {
+    mat4 projectionView;
+    vec4 ambientLightColor;
+    vec3 lightDirection;
+    int lightingEnable;
+} ubo;
 
 void main(){
     vec3 finalColor;
 
-    if (push.enableLighting == 1) {
+    if (ubo.lightingEnable == 1) {
         // 조명이 켜져 있을 때: 방향성 조명 계산
-        vec3 directionToLight = normalize(vec3(1.0, -3.0, -1.0));
-        float lightIntensity = 1.0;
-
-        vec3 ambientLight = vec3(0.1, 0.1, 0.1);
-        vec3 diffuseLight = vec3(lightIntensity) * max(dot(fragNormalWorld, directionToLight), 0);
+        vec3 ambientLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
+        vec3 directionToLight = normalize(-ubo.lightDirection);
+        float diffuseStrength = max(dot(fragNormalWorld, directionToLight), 0);
+        vec3 diffuseLight = vec3(1.0) * diffuseStrength;
 
         finalColor = (diffuseLight + ambientLight) * fragColor;
     } else {
