@@ -1,4 +1,4 @@
-# Vulkan(LightingOnoff) - 조명 추가  
+# Vulkan(DescriptorSet) - 설명자 세트 적용  
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -64,7 +64,8 @@ Tool : Visual Studio Code
 | `VulkanSdk/Apple/` | macOS용 Vulkan SDK 및 라이브러리 |
 | `lot_*.cpp/h` | Vulkan 엔진 컴포넌트들 |
 
-> **참고**: VulkanSdk는 프로젝트 폴더와 같은 레벨에 위치하며, CMakeLists.txt에서 `../VulkanSdk/Win(Linux/Apple)/` 경로로 OS별 참조됩니다.
+> **Note**: VulkanSdk는 프로젝트 폴더와 같은 레벨에 위치하며, CMakeLists.txt에서 `../VulkanSdk/Win(Linux/Apple)/` 경로로 OS별 참조됩니다.
+> **추가**: tiny_obj_loader.h 를 위의 디렉토리를 보고 OS에 따라 복사해주세요.
 
 - 실행결과
   - 좌표계를 오일러에서 쿼터시안으로 변경
