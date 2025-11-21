@@ -26,8 +26,11 @@ void main(){
     if (ubo.lightingEnable == 1) {
         // 조명이 켜져 있을 때: 방향성 조명 계산
         vec3 ambientLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
+
+        // MoltenVK(macOS) 호환성을 위해 노멀 벡터 명시적 정규화
+        vec3 normalWorld = normalize(fragNormalWorld);
         vec3 directionToLight = normalize(-ubo.lightDirection);
-        float diffuseStrength = max(dot(fragNormalWorld, directionToLight), 0);
+        float diffuseStrength = max(dot(normalWorld, directionToLight), 0.0);
         vec3 diffuseLight = vec3(1.0) * diffuseStrength;
 
         finalColor = (diffuseLight + ambientLight) * fragColor;
@@ -38,7 +41,8 @@ void main(){
     // 선택된 객체라면 하이라이트 효과 적용
     if (push.isSelected == 1) {
         // 노멀 벡터를 이용한 가장자리 감지 (더 강하게)
-        float edge = 1.0 - abs(fragNormalWorld.z);
+        vec3 normalWorld = normalize(fragNormalWorld);
+        float edge = 1.0 - abs(normalWorld.z);
         edge = pow(edge, 1.0);  // 지수를 낮춰서 더 넓은 영역에 적용
         
         // 밝은 노란색/주황색 테두리

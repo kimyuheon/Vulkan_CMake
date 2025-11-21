@@ -297,41 +297,41 @@ namespace lot {
         LotModel::Builder modelBuilder {};
         modelBuilder.vertices = {
 
-            // left face (white)
-            {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-            {{-.5f,  .5f,  .5f}, {.9f, .9f, .9f}},
-            {{-.5f, -.5f,  .5f}, {.9f, .9f, .9f}},
-            {{-.5f,  .5f, -.5f}, {.9f, .9f, .9f}},
+            // left face (white) - normal pointing left (-X)
+            {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}},
+            {{-.5f,  .5f,  .5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}},
+            {{-.5f, -.5f,  .5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}},
+            {{-.5f,  .5f, -.5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}},
 
-            // right face (yellow)
-            {{ .5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-            {{ .5f,  .5f,  .5f}, {.8f, .8f, .1f}},
-            {{ .5f, -.5f,  .5f}, {.8f, .8f, .1f}},
-            {{ .5f,  .5f, -.5f}, {.8f, .8f, .1f}},
+            // right face (yellow) - normal pointing right (+X)
+            {{ .5f, -.5f, -.5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}},
+            {{ .5f,  .5f,  .5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}},
+            {{ .5f, -.5f,  .5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}},
+            {{ .5f,  .5f, -.5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}},
 
-            // top face (orange, remember y axis points down)
-            {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-            {{ .5f, -.5f,  .5f}, {.9f, .6f, .1f}},
-            {{-.5f, -.5f,  .5f}, {.9f, .6f, .1f}},
-            {{ .5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+            // top face (orange, remember y axis points down) - normal pointing up (-Y)
+            {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}},
+            {{ .5f, -.5f,  .5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}},
+            {{-.5f, -.5f,  .5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}},
+            {{ .5f, -.5f, -.5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}},
 
-            // bottom face (red)
-            {{-.5f,  .5f, -.5f}, {.8f, .1f, .1f}},
-            {{ .5f,  .5f,  .5f}, {.8f, .1f, .1f}},
-            {{-.5f,  .5f,  .5f}, {.8f, .1f, .1f}},
-            {{ .5f,  .5f, -.5f}, {.8f, .1f, .1f}},
+            // bottom face (red) - normal pointing down (+Y)
+            {{-.5f,  .5f, -.5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}},
+            {{ .5f,  .5f,  .5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}},
+            {{-.5f,  .5f,  .5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}},
+            {{ .5f,  .5f, -.5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}},
 
-            // nose face (blue)
-            {{-.5f, -.5f,  0.5f}, {.1f, .1f, .8f}},
-            {{ .5f,  .5f,  0.5f}, {.1f, .1f, .8f}},
-            {{-.5f,  .5f,  0.5f}, {.1f, .1f, .8f}},
-            {{ .5f, -.5f,  0.5f}, {.1f, .1f, .8f}},
+            // nose face (blue) - normal pointing forward (+Z)
+            {{-.5f, -.5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}},
+            {{ .5f,  .5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}},
+            {{-.5f,  .5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}},
+            {{ .5f, -.5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}},
 
-            // tail face (green)
-            {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-            {{ .5f,  .5f, -0.5f}, {.1f, .8f, .1f}},
-            {{-.5f,  .5f, -0.5f}, {.1f, .8f, .1f}},
-            {{ .5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+            // tail face (green) - normal pointing backward (-Z)
+            {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}},
+            {{ .5f,  .5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}},
+            {{-.5f,  .5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}},
+            {{ .5f, -.5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}},
 
         };
         for (auto& v : modelBuilder.vertices) {
