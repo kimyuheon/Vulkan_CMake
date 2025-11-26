@@ -1,4 +1,4 @@
-# Vulkan(DescriptorSet) - 설명자 세트 적용  
+# Vulkan(PointLight) - PointLight 적용 및 선택 오류 수정 
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -68,6 +68,9 @@ Tool : Visual Studio Code
 
 > **추가**: tiny_obj_loader.h 를 위의 디렉토리를 보고 OS에 따라 복사해주세요.
 
+- 수정사항  
+  - 선택 오류 수정 : 모델의 실제 버텍스로부터 바운딩박스 계산
+
 - 실행결과
   - 좌표계를 오일러에서 쿼터시안으로 변경
   - 선택 시 노란색으로 객체 색상 변경
@@ -83,7 +86,7 @@ Tool : Visual Studio Code
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/2fd84cf2-95cd-44db-a555-a4025853d2e5                  
+        https://github.com/user-attachments/assets/7e9e0888-7b0a-46a4-8638-3c6178c4ff9c                  
     
   - MacOS
       - 실행방법  

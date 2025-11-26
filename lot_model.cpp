@@ -28,6 +28,7 @@ namespace lot {
     : lotDevice(device), vertices(builder.vertices), indices(builder.indices) {
         createVertexBuffers(builder.vertices);
         createIndexBuffers(builder.indices);
+        calculateBoundingBox();
     }
 
     LotModel::~LotModel() {
@@ -223,5 +224,22 @@ namespace lot {
         attributeDescriptions.push_back({3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)});
 
         return attributeDescriptions;
+    }
+
+    void LotModel::calculateBoundingBox() {
+        if (vertices.empty()) {
+            localBoundingBox.min = glm::vec3(0.0f);
+            localBoundingBox.max = glm::vec3(0.0f);
+            return;
+        }
+
+        // 모든 버텍스를 순회하며 최소/최대 좌표 찾기
+        localBoundingBox.min = vertices[0].position;
+        localBoundingBox.max = vertices[0].position;
+
+        for (const auto& vertex : vertices) {
+            localBoundingBox.min = glm::min(localBoundingBox.min, vertex.position);
+            localBoundingBox.max = glm::max(localBoundingBox.max, vertex.position);
+        }
     }
 }

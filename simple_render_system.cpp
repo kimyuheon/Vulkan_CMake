@@ -89,7 +89,7 @@ namespace lot {
             if (obj.model == nullptr) continue;
 
             SimplePushConstantData push{};
-            //push.color = obj.color;
+            push.color = obj.color;
             //push.transform = projectionView * obj.transform.mat4();
             push.modelMatrix = obj.transform.mat4();
             push.normalMatrix = obj.transform.normalMatrix();

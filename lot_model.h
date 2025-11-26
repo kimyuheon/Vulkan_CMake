@@ -31,6 +31,11 @@ namespace lot {
                 }
             };
 
+            struct BoundingBox {
+                glm::vec3 min{std::numeric_limits<float>::max()};
+                glm::vec3 max{std::numeric_limits<float>::lowest()};
+            };
+
             struct Builder {
                 std::vector<Vertex> vertices;
                 std::vector<uint32_t> indices{};
@@ -55,9 +60,13 @@ namespace lot {
             const std::vector<uint32_t>& getIndices() const { return indices; }
             bool hasIndices() const { return hasIndexBuffer; }
 
+            // 로컬 공간에서의 바운딩박스 (Transform 적용 전)
+            const BoundingBox& getLocalBoundingBox() const { return localBoundingBox; }
+
         private:
             void createVertexBuffers(const std::vector<Vertex> &vertices);
             void createIndexBuffers(const std::vector<uint32_t> &indices);
+            void calculateBoundingBox();
 
             LotDevice& lotDevice;
 
@@ -73,5 +82,8 @@ namespace lot {
             // CPU에서 접근 가능한 메시 데이터 (레이캐스팅용)
             std::vector<Vertex> vertices;
             std::vector<uint32_t> indices;
+
+            // 로컬 공간 바운딩박스 (모델 로드 시 계산)
+            BoundingBox localBoundingBox;
     };
 }

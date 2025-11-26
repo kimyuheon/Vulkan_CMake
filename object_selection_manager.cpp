@@ -220,18 +220,48 @@ namespace lot {
             return bbox;
         }
 
-        glm::vec3 scale = object.transform.scale;
-        glm::vec3 translation = object.transform.translation;
+        // 모델의 로컬 바운딩박스 가져오기
+        const auto& localBBox = object.model->getLocalBoundingBox();
 
-        // 큐브의 실제 크기는 1x1x1이므로, 스케일을 그대로 반영
-        glm::vec3 halfSize = glm::vec3(0.5f) * scale;
+        // 8개 코너 생성 (로컬 공간)
+        std::vector<glm::vec3> corners = {
+            {localBBox.min.x, localBBox.min.y, localBBox.min.z},
+            {localBBox.max.x, localBBox.min.y, localBBox.min.z},
+            {localBBox.min.x, localBBox.max.y, localBBox.min.z},
+            {localBBox.max.x, localBBox.max.y, localBBox.min.z},
+            {localBBox.min.x, localBBox.min.y, localBBox.max.z},
+            {localBBox.max.x, localBBox.min.y, localBBox.max.z},
+            {localBBox.min.x, localBBox.max.y, localBBox.max.z},
+            {localBBox.max.x, localBBox.max.y, localBBox.max.z}
+        };
 
-        BoundingBox bbox;
-        bbox.min = translation - halfSize;
-        bbox.max = translation + halfSize;
+        // Transform 적용
+        glm::mat4 modelMatrix = object.transform.mat4();
 
+        BoundingBox worldBBox;
+        worldBBox.min = glm::vec3(std::numeric_limits<float>::max());
+        worldBBox.max = glm::vec3(std::numeric_limits<float>::lowest());
 
-        return bbox;
+        // 모든 코너를 월드 공간으로 변환하고 새로운 AABB 생성
+        for (const auto& corner : corners) {
+            glm::vec3 worldCorner = glm::vec3(modelMatrix * glm::vec4(corner, 1.0f));
+            worldBBox.min = glm::min(worldBBox.min, worldCorner);
+            worldBBox.max = glm::max(worldBBox.max, worldCorner);
+        }
+
+        // 얇은 평면 객체를 위한 최소 두께 적용
+        // 각 축에서 두께가 너무 얇으면 선택이 어려우므로 최소값 보장
+        const float MIN_THICKNESS = 0.01f;
+        for (int i = 0; i < 3; i++) {
+            float thickness = worldBBox.max[i] - worldBBox.min[i];
+            if (thickness < MIN_THICKNESS) {
+                float center = (worldBBox.min[i] + worldBBox.max[i]) * 0.5f;
+                worldBBox.min[i] = center - MIN_THICKNESS * 0.5f;
+                worldBBox.max[i] = center + MIN_THICKNESS * 0.5f;
+            }
+        }
+
+        return worldBBox;
     }
 
     LotGameObject* ObjectSelectionManager::findIntersectedObject(const Ray& ray,

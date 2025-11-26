@@ -17,16 +17,19 @@ layout(push_constant) uniform Push {
 } push;
 
 layout(set = 0, binding = 0) uniform GlobalUbo {
-    mat4 projectionView;
+    mat4 projection;
+    mat4 view;
+    mat4 inverseView;
     vec4 ambientLightColor;
-    vec3 lightingDirection;
-    int lightingEanble;
+    vec3 lightPosition;
+    vec4 lightColor;
+    int lightingEnable;
 } ubo;
 
 void main() {
     //gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);
     vec4 positionWorld = push.modelMatrix * vec4(position, 1.0);
-    gl_Position = ubo.projectionView * positionWorld;
+    gl_Position = ubo.projection * ubo.view * positionWorld;
 
     fragNormalWorld = normalize(mat3(push.normalMatrix) * normal);
     fragPosWorld = positionWorld.xyz;

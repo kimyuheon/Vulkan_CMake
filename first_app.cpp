@@ -25,10 +25,13 @@
 
 namespace lot {
     struct GlobalUbo {
-        glm::mat4 projectionView{1.f};
-        glm::vec4 ambientLightColor{1.f, 1.f, 1.f, .3f};
-        glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
-        int lightingEnabled = 1;
+        glm::mat4 projection{1.f};
+        glm::mat4 View{1.f};
+        glm::mat4 inverseView{1.f};
+        glm::vec4 ambientLightColor{1.f, 1.f, 1.f, .02f};
+        glm::vec3 lightPosition{-1.f};
+        alignas(16) glm::vec4 lightColor{1.f};
+        alignas(4) int lightingEnabled = 1;
     };
     struct SimplePushConstantData {
         glm::mat4 modelMatrix{1.f};
@@ -127,9 +130,12 @@ namespace lot {
                 int frameIndex = lotRenderer.getFrameIndex();
 
                 GlobalUbo ubo{};
-                ubo.projectionView = camera.getProjection() * camera.getView();
-                ubo.ambientLightColor = glm::vec4(1.f, 1.f, 1.f, .3f);
-                ubo.lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+                ubo.projection = camera.getProjection();
+                ubo.View = camera.getView();
+                ubo.inverseView = camera.getInverseView();
+                ubo.ambientLightColor = glm::vec4(1.f, 1.f, 1.f, .02f);
+                ubo.lightPosition = glm::vec3{-1.f};
+                ubo.lightColor = glm::vec4{1.f};
                 ubo.lightingEnabled = enableLighting ? 1 : 0;
 
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
@@ -231,13 +237,13 @@ namespace lot {
         
         // 투영 설정 (기존 유지)
         if (projectionType == KeyboardMoveCtrl::ProjectionType::Perspective) {
-            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
+            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.01f, 100.f);
         } else {
             float orthoSize = 1.0f;
             camera.setOrthographicProjection(
                 -orthoSize * aspect, orthoSize * aspect,
                 -orthoSize, orthoSize,
-                0.1f, 10.f
+                0.01f, 100.f
             );
         }
     }
@@ -361,30 +367,46 @@ namespace lot {
         cube1.model = lotModel;
         cube1.transform.translation = { .0f, .0f, 2.5f };
         cube1.transform.scale = {.5f, .5f, .5f};
-        cube1.color = {1.0f, 0.0f, 0.0f};
+        cube1.color = {0.0f, 0.0f, 0.0f};  // 버텍스 색상 사용
         gameObjects.push_back(std::move(cube1));
 
         auto cube2 = LotGameObject::createGameObject();
         cube2.model = lotModel;
         cube2.transform.translation = { 1.5f, .0f, 2.5f };
         cube2.transform.scale = {.3f, .3f, .3f};
-        cube2.color = {0.0f, 1.0f, 0.0f};
+        cube2.color = {0.0f, 0.0f, 0.0f};  // 버텍스 색상 사용
         gameObjects.push_back(std::move(cube2));
 
         auto cube3 = LotGameObject::createGameObject();
         cube3.model = lotModel;
         cube3.transform.translation = { -1.5f, .0f, 2.5f };
         cube3.transform.scale = {.4f, .4f, .4f};
-        cube3.color = {0.0f, 0.0f, 1.0f};
+        cube3.color = {0.0f, 0.0f, 0.0f};  // 버텍스 색상 사용
         gameObjects.push_back(std::move(cube3));
 
         std::shared_ptr<LotModel> objModel = 
             LotModel::createModelFromFile(lotDevice, "models/smooth_vase.obj");
         auto obj = LotGameObject::createGameObject();
         obj.model = objModel;
-        obj.transform.translation = { .0f, .0f, 1.5f };
+        obj.transform.translation = { .0f, .5f, -.5f };
         obj.transform.scale = glm::vec3(3.f);
+        obj.color = {0.3f, 0.5f, 0.8f};
         gameObjects.push_back(std::move(obj));
+
+        objModel = LotModel::createModelFromFile(lotDevice, "models/flat_vase.obj");
+        auto flat_vase = LotGameObject::createGameObject();
+        flat_vase.model = objModel;
+        flat_vase.transform.translation = { .0f, .0f, 1.f };
+        flat_vase.transform.scale = glm::vec3{ 2.5f, 1.5f, 2.5f };
+        flat_vase.color = {0.3f, 0.5f, 0.8f};
+        gameObjects.push_back(std::move(flat_vase));
+
+        objModel = LotModel::createModelFromFile(lotDevice, "models/quad.obj");
+        auto quad_vase = LotGameObject::createGameObject();
+        quad_vase.model = objModel;
+        quad_vase.transform.translation = { 0.f, .5f, 2.5f };
+        quad_vase.transform.scale = glm::vec3{ 4.f, 1.f, 4.f };
+        gameObjects.push_back(std::move(quad_vase));
     }
 
     void FirstApp::addNewCube() {

@@ -22,6 +22,7 @@ namespace lot {
 
             const glm::mat4& getProjection() const { return projectionMatrix; }
             const glm::mat4& getView() const { return viewMatrix; }
+            glm::mat4 getInverseView() const { return glm::inverse(viewMatrix); }
 
         private:
             glm::mat4 projectionMatrix{1.f};

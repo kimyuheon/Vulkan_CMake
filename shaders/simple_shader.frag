@@ -14,29 +14,47 @@ layout(push_constant) uniform Push {
 } push;
 
 layout(set = 0, binding = 0) uniform GlobalUbo {
-    mat4 projectionView;
+    mat4 projection;
+    mat4 view;
+    mat4 inverseView;
     vec4 ambientLightColor;
-    vec3 lightDirection;
+    vec3 lightPosition;
+    vec4 lightColor;
     int lightingEnable;
 } ubo;
 
 void main(){
+    vec3 baseColor;
+    if (length(push.color) > 0.01) {
+        baseColor = push.color;  // GameObject의 color 사용
+    } else {
+        baseColor = fragColor;   // 버텍스 색상 사용
+    }
+
     vec3 finalColor;
 
     if (ubo.lightingEnable == 1) {
         // 조명이 켜져 있을 때: 방향성 조명 계산
+        // 각 프레임마다 빛까지의 방향 계산
+        vec3 directionToLight = ubo.lightPosition - fragPosWorld;
+        // 거리 감쇠 계산
+        float attenuation = 1.0 / dot(directionToLight, directionToLight);
+
+        // 감쇠가 적용된 빛 색상
+        vec3 lightColor = ubo.lightColor.xyz * ubo.lightColor.w * attenuation;
         vec3 ambientLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
 
         // MoltenVK(macOS) 호환성을 위해 노멀 벡터 명시적 정규화
         vec3 normalWorld = normalize(fragNormalWorld);
-        vec3 directionToLight = normalize(-ubo.lightDirection);
-        float diffuseStrength = max(dot(normalWorld, directionToLight), 0.0);
-        vec3 diffuseLight = vec3(1.0) * diffuseStrength;
+        vec3 directionToLightNorm = normalize(directionToLight);
 
-        finalColor = (diffuseLight + ambientLight) * fragColor;
+        float cosAngIncidence = max(dot(normalWorld, directionToLightNorm), 0);
+        vec3 diffuseLight = lightColor * cosAngIncidence;
+
+        finalColor = (diffuseLight + ambientLight) * baseColor;
     } else {
         // 조명이 꺼져 있을 때: 균일한 밝기 (플랫 셰이딩)
-        finalColor = fragColor * 0.7;
+        finalColor = baseColor * 0.8;
     }
     // 선택된 객체라면 하이라이트 효과 적용
     if (push.isSelected == 1) {
