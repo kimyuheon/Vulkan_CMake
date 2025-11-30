@@ -23,14 +23,23 @@
 
 #include <thread>
 
+#define MAX_LIGHTS 10
+
 namespace lot {
+    struct PointLight {
+        glm::vec4 position;
+        glm::vec4 color;
+    };
+
     struct GlobalUbo {
         glm::mat4 projection{1.f};
         glm::mat4 View{1.f};
         glm::mat4 inverseView{1.f};
         glm::vec4 ambientLightColor{1.f, 1.f, 1.f, .02f};
-        glm::vec3 lightPosition{-1.f};
-        alignas(16) glm::vec4 lightColor{1.f};
+        //glm::vec3 lightPosition{-1.f};
+        //alignas(16) glm::vec4 lightColor{1.f};
+        PointLight pointLights[MAX_LIGHTS];
+        alignas(4) int numLights;
         alignas(4) int lightingEnabled = 1;
     };
     struct SimplePushConstantData {
@@ -134,8 +143,24 @@ namespace lot {
                 ubo.View = camera.getView();
                 ubo.inverseView = camera.getInverseView();
                 ubo.ambientLightColor = glm::vec4(1.f, 1.f, 1.f, .02f);
-                ubo.lightPosition = glm::vec3{-1.f};
-                ubo.lightColor = glm::vec4{1.f};
+                // 여러 포인트 라이트 설정
+                ubo.numLights = 3;
+
+                // Ligtht 1 : Red
+                // 라이트 1: 빨간색
+                ubo.pointLights[0].position = glm::vec4(-1.0f, -1.0f, -1.0f, 0.1f);
+                ubo.pointLights[0].color = glm::vec4(1.0f, 0.1f, 0.1f, 0.8f);
+
+                // Ligtht 2 : Green
+                // 라이트 2: 초록색
+                ubo.pointLights[1].position = glm::vec4(0.0f, -1.0f, 0.0f, 0.1f);
+                ubo.pointLights[1].color = glm::vec4(0.1f, 1.0f, 0.1f, 0.8f);
+
+                // Ligtht 3 : Blue
+                // 라이트 3: 파란색
+                ubo.pointLights[2].position = glm::vec4(1.0f, -1.0f, 1.0f, 0.1f);
+                ubo.pointLights[2].color = glm::vec4(0.1f, 0.1f, 1.0f, 0.8f);
+
                 ubo.lightingEnabled = enableLighting ? 1 : 0;
 
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);

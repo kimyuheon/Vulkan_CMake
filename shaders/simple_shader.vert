@@ -16,15 +16,23 @@ layout(push_constant) uniform Push {
     int isSelected;
 } push;
 
+struct PointLight {
+    vec4 position;
+    vec4 color;
+};
+
 layout(set = 0, binding = 0) uniform GlobalUbo {
     mat4 projection;
     mat4 view;
     mat4 inverseView;
     vec4 ambientLightColor;
-    vec3 lightPosition;
-    vec4 lightColor;
+    //vec3 lightPosition;
+    //vec4 lightColor;
+    PointLight pointLights[10];
+    int numLights;
     int lightingEnable;
 } ubo;
+
 
 void main() {
     //gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);
