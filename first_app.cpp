@@ -88,6 +88,13 @@ namespace lot {
             lotRenderer.getSwapChainRenderPass(),
             globalSetLayout->getDescriptorSetLayout()
         );
+
+        // PointLightSystem
+        pointLightSystem = std::make_unique<PointLightSystem>(
+            lotDevice,
+            lotRenderer.getSwapChainRenderPass(),
+            globalSetLayout->getDescriptorSetLayout()
+        );
     }
 
     FirstApp::~FirstApp() {
@@ -173,6 +180,7 @@ namespace lot {
                 lotRenderer.beginSwapChainRenderPass(commandBuffer);
 
                 simpleRenderSystem->renderGameObjects(frameInfo, gameObjects);
+                pointLightSystem->render(frameInfo);
                 simpleRenderSystem->renderHighlights(frameInfo, gameObjects);
 
                 lotRenderer.endSwapChainRenderPass(commandBuffer);

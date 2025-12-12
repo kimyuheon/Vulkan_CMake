@@ -1,4 +1,4 @@
-# Vulkan(PointLight) - PointLight 적용 및 선택 오류 수정 
+# Vulkan(PointLight) - Point Light 시각화 및 Validation 경고 해결 
 
 Tool : Visual Studio Code
 - 파일 구조

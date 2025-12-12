@@ -92,6 +92,9 @@ namespace lot {
         configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
         configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
         configInfo.dynamicStateInfo.flags = 0;
+
+        configInfo.bindingDescription = LotModel::Vertex::getBindingDescriptions();
+        configInfo.attributeDescription = LotModel::Vertex::getAttributeDescriptions();
     }
 
     std::vector<char> LotPipeline::readFile(const std::string& filepath) {
@@ -141,8 +144,8 @@ namespace lot {
         shaderStages[1].pNext = nullptr;
         shaderStages[1].pSpecializationInfo = nullptr;
 
-        auto bindingDescriptions = LotModel::Vertex::getBindingDescriptions();
-        auto attributeDescriptions = LotModel::Vertex::getAttributeDescriptions();
+        auto bindingDescriptions = configInfo.bindingDescription;
+        auto attributeDescriptions = configInfo.attributeDescription;
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());

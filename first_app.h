@@ -8,6 +8,7 @@
 #include "keyboard_move_ctrl.h"
 #include "lot_camera.h"
 #include "simple_render_system.h"
+#include "point_light_system.h"
 #include "lot_buffer.h"
 #include "lot_descriptors.h"
 
@@ -58,6 +59,7 @@ namespace lot {
             std::vector<VkDescriptorSet> globalDescriptorSets;
 
             std::unique_ptr<SimpleRenderSystem> simpleRenderSystem;
+            std::unique_ptr<PointLightSystem> pointLightSystem;
             std::vector<LotGameObject> gameObjects;
             ObjectSelectionManager selectionManager;
     };

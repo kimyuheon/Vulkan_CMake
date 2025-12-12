@@ -313,7 +313,7 @@ else()
             foreach(SHADER_FILE ${GLSL_SHADERS})
                 get_filename_component(SHADER_NAME ${SHADER_FILE} NAME)
                 set(SPV_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/shaders/${SHADER_NAME}.spv")
-                
+                message(STATUS "files - ${SHADER_FILE}")
                 # SPIR-V 컴파일
                 add_custom_command(
                     OUTPUT "${SPV_OUTPUT}"
