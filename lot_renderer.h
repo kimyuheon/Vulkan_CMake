@@ -21,6 +21,8 @@ namespace lot {
             float getAspectRatio() const { return lotSwapChain->extentAspectRatio(); }
             bool isFrameInProgress() const { return isFrameStarted; }
 
+            size_t getFrameCount() const { return lotSwapChain->imageCount(); }
+
             VkCommandBuffer getCurrentCommandBuffer() const {
                 assert(isFrameStarted && "Cannot get command buffer when frame not in progress");
                 return commandBuffers[currentFrameIndex];

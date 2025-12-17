@@ -57,8 +57,11 @@ namespace lot {
         .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
         .build();
 
+        // 동적 크기로 변경
+        size_t frameCount = lotRenderer.getFrameCount();
+
         // Uniform Buffer
-        uboBuffers.resize(LotSwapChain::MAX_FRAMES_IN_FLIGHT);
+        uboBuffers.resize(frameCount);
         for (int i = 0; i < uboBuffers.size(); i++) {
             uboBuffers[i] = std::make_unique<LotBuffer>(
                 lotDevice, sizeof(GlobalUbo), 1, 
@@ -69,12 +72,12 @@ namespace lot {
 
         // Descriptor Pool
         globalPool = LotDescriptorPool::Builder(lotDevice)
-        .setMaxSets(LotSwapChain::MAX_FRAMES_IN_FLIGHT)
-        .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, LotSwapChain::MAX_FRAMES_IN_FLIGHT)
+        .setMaxSets(static_cast<uint32_t>(frameCount))
+        .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, static_cast<uint32_t>(frameCount))
         .build();
 
         // Descriptor Sets
-        globalDescriptorSets.resize(LotSwapChain::MAX_FRAMES_IN_FLIGHT);
+        globalDescriptorSets.resize(frameCount);
         for (int i = 0; i < globalDescriptorSets.size(); i++) {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
             LotDescriptorWriter(*globalSetLayout, *globalPool)

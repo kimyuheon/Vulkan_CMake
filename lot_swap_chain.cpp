@@ -55,9 +55,11 @@ namespace lot {
         vkDestroyRenderPass(device.device(), renderPass, nullptr);
 
         // cleanup synchronization objects
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        for (size_t i = 0; i < imageCount(); i++) {
             vkDestroySemaphore(device.device(), renderFinishedSemaphores[i], nullptr);
             vkDestroySemaphore(device.device(), imageAvailableSemaphores[i], nullptr);
+        }
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroyFence(device.device(), inFlightFences[i], nullptr);
         }
     }
@@ -75,14 +77,23 @@ namespace lot {
         static constexpr uint64_t ACQUIRE_TIMEOUT_NS = 0; // Windows/macOS: 즉시 반환
     #endif
     VkResult LotSwapChain::acquireNextImage(uint32_t *imageIndex) {
-        vkWaitForFences(device.device(), 1, &inFlightFences[currentFrame], VK_TRUE, 
+        vkWaitForFences(device.device(), 1, &inFlightFences[currentFrame], VK_TRUE,
                         std::numeric_limits<uint64_t>::max());
 
-        VkResult result = vkAcquireNextImageKHR(device.device(), swapChain, 
-                                                //std::numeric_limits<uint64_t>::max(), 
+        // 라운드 로빈 방식으로 다음 세마포어 선택
+        uint32_t semIndex = nextSemaphoreIndex;
+        nextSemaphoreIndex = (nextSemaphoreIndex + 1) % imageCount();
+
+        // 이 프레임이 사용할 세마포어 인덱스 저장
+        frameSemaphoreIndices[currentFrame] = semIndex;
+
+        // 이미지 획득 - 선택된 세마포어 사용
+        VkResult result = vkAcquireNextImageKHR(device.device(), swapChain,
+                                                //std::numeric_limits<uint64_t>::max(),
                                                 ACQUIRE_TIMEOUT_NS,
-                                                imageAvailableSemaphores[currentFrame], 
-                                                VK_NULL_HANDLE, imageIndex);
+                                                imageAvailableSemaphores[semIndex],
+                                                VK_NULL_HANDLE,
+                                                imageIndex);
 
         return result;
     }
@@ -93,10 +104,13 @@ namespace lot {
         }
         imagesInFlight[*imageIndex] = inFlightFences[currentFrame];
 
+        // acquireNextImage에서 저장한 세마포어 인덱스 가져오기
+        uint32_t semIndex = frameSemaphoreIndices[currentFrame];
+
         VkSubmitInfo submitInfo = {};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] };
+        VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[semIndex] };
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
@@ -105,7 +119,7 @@ namespace lot {
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = buffers;
 
-        VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[currentFrame]};
+        VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[semIndex]};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
@@ -185,6 +199,8 @@ namespace lot {
         vkGetSwapchainImagesKHR(device.device(), swapChain, &imageCount, nullptr);
         swapChainImages.resize(imageCount);
         vkGetSwapchainImagesKHR(device.device(), swapChain, &imageCount, swapChainImages.data());
+
+        std::cout << "Swapchain image count: " << imageCount << std::endl;
 
         swapChainImageFormat = surfaceFormat.format;
         swapChainExtent = extent;
@@ -339,23 +355,32 @@ namespace lot {
     }
 
     void LotSwapChain::createSyncObjects() {
-        imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-        renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+        // 각 스왑체인 이미지마다 별도의 세마포어 생성 (검증 레이어 권장)
+        imageAvailableSemaphores.resize(imageCount());
+        renderFinishedSemaphores.resize(imageCount());
         inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
         imagesInFlight.resize(imageCount(), VK_NULL_HANDLE);
+        frameSemaphoreIndices.resize(MAX_FRAMES_IN_FLIGHT, 0);
 
         VkSemaphoreCreateInfo semaphoreInfo = {};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        
+
         VkFenceCreateInfo fenceInfo = {};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        // 스왑체인 이미지마다 세마포어 생성
+        for (size_t i = 0; i < imageCount(); i++) {
             if (vkCreateSemaphore(device.device(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
-                vkCreateSemaphore(device.device(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
-                vkCreateFence(device.device(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
-                throw std::runtime_error("failed to create synchronization objects for a frame!");
+                vkCreateSemaphore(device.device(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS) {
+                throw std::runtime_error("failed to create synchronization objects for a swapchain image!");
+            }
+        }
+
+        // 프레임 인 플라이트 펜스 생성
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+            if (vkCreateFence(device.device(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
+                throw std::runtime_error("failed to create fence for frame in flight!");
             }
         }
     }

@@ -23,7 +23,7 @@ namespace lot {
     LotRenderer::~LotRenderer() { freeCommandBuffers(); }
 
     void LotRenderer::createCommandBuffers() {
-        commandBuffers.resize(LotSwapChain::MAX_FRAMES_IN_FLIGHT);
+        commandBuffers.resize(lotSwapChain->imageCount());
 
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -109,7 +109,7 @@ namespace lot {
         }
 
         isFrameStarted = false;
-        currentFrameIndex = (currentFrameIndex + 1) % LotSwapChain::MAX_FRAMES_IN_FLIGHT;
+        currentFrameIndex = (currentFrameIndex + 1) % lotSwapChain->imageCount();
     }
 
     void LotRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {

@@ -81,6 +81,8 @@ namespace lot {
             std::vector<VkSemaphore> renderFinishedSemaphores;
             std::vector<VkFence> inFlightFences;
             std::vector<VkFence> imagesInFlight;
+            std::vector<uint32_t> frameSemaphoreIndices;  // 각 프레임이 사용한 세마포어 인덱스
             size_t currentFrame = 0;
+            uint32_t nextSemaphoreIndex = 0;  // 다음에 사용할 세마포어 인덱스
     };
 } // namespace lot
