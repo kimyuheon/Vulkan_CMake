@@ -88,7 +88,7 @@ namespace lot {
         }
     }
 
-    void KeyboardMoveCtrl::rotateObjects(GLFWwindow* window, float dt, std::vector<LotGameObject>& objects) {
+    void KeyboardMoveCtrl::rotateObjects(GLFWwindow* window, float dt, LotGameObject::Map& objects) {
         if (objects.empty()) {
             hasValidObjectSelection = false;
             return;
@@ -377,7 +377,7 @@ namespace lot {
     }
 
     // 내부 헬퍼 함수
-    void KeyboardMoveCtrl::handleKeyboardObjectControl(GLFWwindow* window, float dt, std::vector<LotGameObject>& gameObject) {
+    void KeyboardMoveCtrl::handleKeyboardObjectControl(GLFWwindow* window, float dt, LotGameObject::Map& gameObject) {
         //if (!hasValidObjectSelection || selectedObjectIndex >= gameObject.size()) {
         //    return;
         //}
@@ -407,7 +407,8 @@ namespace lot {
 
         // 회전 적용
         if (glm::dot(rotationDelta, rotationDelta) > std::numeric_limits<float>::epsilon()) {
-            for (auto& obj : gameObject) {
+            for (auto& kv : gameObject) {
+                auto& obj = kv.second;
                 if (obj.isSelected) {
                     // 회전값 정규화 (0 ~ 360)
                     if (rotationDelta.x != 0.0f) obj.transform.rotateAroundAxis(rotationDelta.x, glm::vec3(1, 0, 0));
@@ -431,7 +432,7 @@ namespace lot {
     }
 
     // 객체 선택 함수
-    void KeyboardMoveCtrl::selectObject(size_t index, const std::vector<LotGameObject>& objects) {
+    void KeyboardMoveCtrl::selectObject(size_t index, const LotGameObject::Map& objects) {
         if (index < objects.size()) {
             selectedObjectIndex = index;
             hasValidObjectSelection = true;
@@ -441,7 +442,7 @@ namespace lot {
         }
     }
 
-    void KeyboardMoveCtrl::selectNextObject(const std::vector<LotGameObject>& objects) {
+    void KeyboardMoveCtrl::selectNextObject(const LotGameObject::Map& objects) {
         if (objects.empty()) {
             hasValidObjectSelection = false;
             return;
@@ -451,7 +452,7 @@ namespace lot {
         selectObject(nextIndex, objects);
     }
 
-    void KeyboardMoveCtrl::selectPrevObject(const std::vector<LotGameObject>& objects) {
+    void KeyboardMoveCtrl::selectPrevObject(const LotGameObject::Map& objects) {
         if (objects.empty()) {
             hasValidObjectSelection = false;
             return;

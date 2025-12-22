@@ -55,7 +55,7 @@ namespace lot {
 
             // 제어 함수
             void moveInPlaneXZ(GLFWwindow* window, float dt, LotGameObject& gameObject);
-            void rotateObjects(GLFWwindow* window, float dt, std::vector<LotGameObject>& objects);
+            void rotateObjects(GLFWwindow* window, float dt, LotGameObject::Map& objects);
             void handleMouseCameraControl(GLFWwindow* window, float dt, LotGameObject& cameraObject, glm::vec3& targetPoint);
             // 투영 정보를 받는 새로운 함수 추가
             void handleMouseCameraControlWithProjection(
@@ -68,9 +68,9 @@ namespace lot {
             );
 
             // 객체 회전 함수들
-            void selectObject(size_t index, const std::vector<LotGameObject>& objects);
-            void selectNextObject(const std::vector<LotGameObject>& objects);
-            void selectPrevObject(const std::vector<LotGameObject>& objects);
+            void selectObject(size_t index, const LotGameObject::Map& objects);
+            void selectNextObject(const LotGameObject::Map& objects);
+            void selectPrevObject(const LotGameObject::Map& objects);
             void rotateObjectsTest(GLFWwindow* window, float dt, LotGameObject& gameObject);
 
             // 현재 선택된 객체 정보
@@ -109,7 +109,7 @@ namespace lot {
             float maxOrthoSize{10.0f};
         private:
             // 내부 헬퍼 함수들
-            void handleKeyboardObjectControl(GLFWwindow* window, float dt, std::vector<LotGameObject>& gameObject);
+            void handleKeyboardObjectControl(GLFWwindow* window, float dt, LotGameObject::Map& gameObject);
             void processMouseInput(GLFWwindow* window);
 
             // 객체 선택 관련 건

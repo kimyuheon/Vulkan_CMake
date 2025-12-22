@@ -68,7 +68,7 @@ namespace lot {
             pipelineConfig);
     }
 
-    void SimpleRenderSystem::renderGameObjects(FrameInfo &frameInfo, std::vector<LotGameObject> &gameObjects) {
+    void SimpleRenderSystem::renderGameObjects(FrameInfo &frameInfo) {
         lotPipeline->bind(frameInfo.commandBuffer);
         
         vkCmdBindDescriptorSets(
@@ -82,10 +82,10 @@ namespace lot {
             nullptr
         );
 
-        for (auto& obj : gameObjects) {
+        for (auto& kv : frameInfo.Objects) {
             //obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.0001f, glm::two_pi<float>());
             //obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.00005f, glm::two_pi<float>());
-
+            auto& obj = kv.second;
             if (obj.model == nullptr) continue;
 
             SimplePushConstantData push{};
@@ -129,7 +129,7 @@ namespace lot {
             pipelineConfig);
     }
 
-    void SimpleRenderSystem::renderHighlights(FrameInfo &frameInfo, std::vector<LotGameObject> &gameObjects) {
+    void SimpleRenderSystem::renderHighlights(FrameInfo &frameInfo) {
         highlightPipeline->bind(frameInfo.commandBuffer);
 
         vkCmdBindDescriptorSets(
@@ -143,7 +143,8 @@ namespace lot {
             nullptr
         );
 
-        for (auto& obj : gameObjects) {
+        for (auto& kv : frameInfo.Objects) {
+            auto& obj = kv.second;
             if (!obj.isSelected) continue;
 
             SimplePushConstantData push{};

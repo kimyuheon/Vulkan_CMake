@@ -7,7 +7,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <memory>
-
+#include <unordered_map>
 
 namespace lot {
     struct Transformcomponent {
@@ -48,14 +48,22 @@ namespace lot {
         glm::vec3 forward() const { return glm::mat3_cast(rotation) * glm::vec3(0,0,-1); }
     };
 
+    struct PointLightComponent {
+        float lightIntensity = 1.0f;
+    };
+
     class LotGameObject {
         public:
             using id_t = unsigned int;
+            using Map = std::unordered_map<id_t, LotGameObject>;
 
             static LotGameObject createGameObject() {
                 static id_t currentId = 0;
                 return LotGameObject{currentId++};
             }
+
+            static LotGameObject makePointLight(
+                float intensity = 10.f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.f));
 
             LotGameObject(const LotGameObject &) = delete;
             LotGameObject& operator=(const LotGameObject &) = delete;
@@ -65,6 +73,8 @@ namespace lot {
             id_t getId() const { return id; }
 
             std::shared_ptr<LotModel> model{};
+            std::unique_ptr<PointLightComponent> pointLight = nullptr;
+
             glm::vec3 color{};
             Transformcomponent transform{};
             bool isSelected{false};

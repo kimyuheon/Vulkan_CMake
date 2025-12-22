@@ -3,8 +3,10 @@
 #include "keyboard_move_ctrl.h"
 #include "lot_camera.h"
 #include "simple_render_system.h"
+#include "point_light_system.h"
 #include "lot_buffer.h"
 #include "lot_descriptors.h"
+#include "lot_frame_info.h"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -26,29 +28,6 @@
 #define MAX_LIGHTS 10
 
 namespace lot {
-    struct PointLight {
-        glm::vec4 position;
-        glm::vec4 color;
-    };
-
-    struct GlobalUbo {
-        glm::mat4 projection{1.f};
-        glm::mat4 View{1.f};
-        glm::mat4 inverseView{1.f};
-        glm::vec4 ambientLightColor{1.f, 1.f, 1.f, .02f};
-        //glm::vec3 lightPosition{-1.f};
-        //alignas(16) glm::vec4 lightColor{1.f};
-        PointLight pointLights[MAX_LIGHTS];
-        alignas(4) int numLights;
-        alignas(4) int lightingEnabled = 1;
-    };
-    struct SimplePushConstantData {
-        glm::mat4 modelMatrix{1.f};
-        glm::mat4 normalMatrix{1.f};
-        alignas(16) glm::vec3 color{};
-        int isSelected{0};
-    };
-
     FirstApp::FirstApp() { 
         loadGameObjects(); 
 
@@ -148,45 +127,32 @@ namespace lot {
             if (auto commandBuffer = lotRenderer.beginFrame()) {
                 int frameIndex = lotRenderer.getFrameIndex();
 
+                FrameInfo frameInfo {
+                    frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], gameObjects
+                };
+
                 GlobalUbo ubo{};
                 ubo.projection = camera.getProjection();
                 ubo.View = camera.getView();
                 ubo.inverseView = camera.getInverseView();
                 ubo.ambientLightColor = glm::vec4(1.f, 1.f, 1.f, .02f);
-                // 여러 포인트 라이트 설정
-                ubo.numLights = 3;
-
-                // Ligtht 1 : Red
-                // 라이트 1: 빨간색
-                ubo.pointLights[0].position = glm::vec4(-1.0f, -1.0f, -1.0f, 0.1f);
-                ubo.pointLights[0].color = glm::vec4(1.0f, 0.1f, 0.1f, 0.8f);
-
-                // Ligtht 2 : Green
-                // 라이트 2: 초록색
-                ubo.pointLights[1].position = glm::vec4(0.0f, -1.0f, 0.0f, 0.1f);
-                ubo.pointLights[1].color = glm::vec4(0.1f, 1.0f, 0.1f, 0.8f);
-
-                // Ligtht 3 : Blue
-                // 라이트 3: 파란색
-                ubo.pointLights[2].position = glm::vec4(1.0f, -1.0f, 1.0f, 0.1f);
-                ubo.pointLights[2].color = glm::vec4(0.1f, 0.1f, 1.0f, 0.8f);
-
+                
+                // === 게임 로직 업데이트 ===
+                pointLightSystem->update(frameInfo, ubo);
+                
                 ubo.lightingEnabled = enableLighting ? 1 : 0;
-
+                
+                // === GPU에 UBO 전송 ===
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
-
-                FrameInfo frameInfo {
-                    frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex]
-                };
-
+                
                 lotRenderer.beginSwapChainRenderPass(commandBuffer);
 
-                simpleRenderSystem->renderGameObjects(frameInfo, gameObjects);
+                simpleRenderSystem->renderGameObjects(frameInfo);
                 pointLightSystem->render(frameInfo);
-                simpleRenderSystem->renderHighlights(frameInfo, gameObjects);
-
+                simpleRenderSystem->renderHighlights(frameInfo);
                 lotRenderer.endSwapChainRenderPass(commandBuffer);
+
                 lotRenderer.endFrame();
             }
         }
@@ -308,7 +274,8 @@ namespace lot {
             std::cout << "Lighting: " << (enableLighting ? "ON" : "OFF") << std::endl;
 
             int selectedCount = 0;
-            for (const auto& obj : gameObjects) {
+            for (const auto& kv : gameObjects) {
+                auto& obj = kv.second;
                 if (obj.isSelected) selectedCount++;
                 std::cout << "Object ID " << obj.getId()
                           << " - Pos: (" << obj.transform.translation.x << ", "
@@ -404,21 +371,21 @@ namespace lot {
         cube1.transform.translation = { .0f, .0f, 2.5f };
         cube1.transform.scale = {.5f, .5f, .5f};
         cube1.color = {0.0f, 0.0f, 0.0f};  // 버텍스 색상 사용
-        gameObjects.push_back(std::move(cube1));
+        gameObjects.emplace(cube1.getId(), std::move(cube1));
 
         auto cube2 = LotGameObject::createGameObject();
         cube2.model = lotModel;
         cube2.transform.translation = { 1.5f, .0f, 2.5f };
         cube2.transform.scale = {.3f, .3f, .3f};
         cube2.color = {0.0f, 0.0f, 0.0f};  // 버텍스 색상 사용
-        gameObjects.push_back(std::move(cube2));
+        gameObjects.emplace(cube2.getId(), std::move(cube2));
 
         auto cube3 = LotGameObject::createGameObject();
         cube3.model = lotModel;
         cube3.transform.translation = { -1.5f, .0f, 2.5f };
         cube3.transform.scale = {.4f, .4f, .4f};
         cube3.color = {0.0f, 0.0f, 0.0f};  // 버텍스 색상 사용
-        gameObjects.push_back(std::move(cube3));
+        gameObjects.emplace(cube3.getId(), std::move(cube3));
 
         std::shared_ptr<LotModel> objModel = 
             LotModel::createModelFromFile(lotDevice, "models/smooth_vase.obj");
@@ -427,7 +394,7 @@ namespace lot {
         obj.transform.translation = { .0f, .5f, -.5f };
         obj.transform.scale = glm::vec3(3.f);
         obj.color = {0.3f, 0.5f, 0.8f};
-        gameObjects.push_back(std::move(obj));
+        gameObjects.emplace(obj.getId(), std::move(obj));
 
         objModel = LotModel::createModelFromFile(lotDevice, "models/flat_vase.obj");
         auto flat_vase = LotGameObject::createGameObject();
@@ -435,14 +402,34 @@ namespace lot {
         flat_vase.transform.translation = { .0f, .0f, 1.f };
         flat_vase.transform.scale = glm::vec3{ 2.5f, 1.5f, 2.5f };
         flat_vase.color = {0.3f, 0.5f, 0.8f};
-        gameObjects.push_back(std::move(flat_vase));
+        gameObjects.emplace(flat_vase.getId(), std::move(flat_vase));
 
         objModel = LotModel::createModelFromFile(lotDevice, "models/quad.obj");
         auto quad_vase = LotGameObject::createGameObject();
         quad_vase.model = objModel;
         quad_vase.transform.translation = { 0.f, .5f, 2.5f };
         quad_vase.transform.scale = glm::vec3{ 4.f, 1.f, 4.f };
-        gameObjects.push_back(std::move(quad_vase));
+        gameObjects.emplace(quad_vase.getId(), std::move(quad_vase));
+
+        std::vector<glm::vec3> lightColors{
+            {  1.f,  .1f,  .1f},
+            {  .1f,  .1f,  1.f},
+            {  .1f,  1.f,  .1f},
+            {  1.f,  1.f,  .1f},
+            {  .1f,  1.f,  1.f},
+            {  1.f,  1.f,  1.f}
+        };
+
+        for (int i = 0; i < lightColors.size(); i++) {
+            auto pointLight = LotGameObject::makePointLight(0.2f);
+            pointLight.color = lightColors[i];
+            auto rotateLight = glm::rotate(glm::mat4(1.f), 
+                                          (i * glm::two_pi<float>() / lightColors.size()),
+                                          {0.f, -1.f, 0.f});
+            pointLight.transform.translation = 
+                glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
+            gameObjects.emplace(pointLight.getId(), std::move(pointLight));
+        }
     }
 
     void FirstApp::addNewCube() {
@@ -466,15 +453,23 @@ namespace lot {
             (rand() % 100) / 100.0f
         };
 
-        gameObjects.push_back(std::move(newCube));
+        gameObjects.emplace(newCube.getId(), std::move(newCube));
     }
 
     void FirstApp::removeSelectedObjects() {
-        gameObjects.erase(
+        /* gameObjects.erase(
             std::remove_if(gameObjects.begin(), gameObjects.end(),
                 [](const LotGameObject& obj) { return obj.isSelected; }),
             gameObjects.end()
-        );
+        ); */
+
+        for (auto it = gameObjects.begin(); it != gameObjects.end();) {
+            if (it->second.isSelected) {
+                it = gameObjects.erase(it);
+            } else {
+                ++it;
+            }
+        }
 
         selectionManager.clearAllSelections(gameObjects);
     }

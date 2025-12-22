@@ -19,8 +19,8 @@ namespace lot {
             SimpleRenderSystem(const SimpleRenderSystem &) = delete;
             SimpleRenderSystem& operator=(const SimpleRenderSystem &) = delete;
 
-            void renderGameObjects(FrameInfo &frameInfo, std::vector<LotGameObject> &gameObjects);
-            void renderHighlights(FrameInfo &frameInfo, std::vector<LotGameObject> &gameObjects);
+            void renderGameObjects(FrameInfo &frameInfo);
+            void renderHighlights(FrameInfo &frameInfo);
         private:
             void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
             void createPipeline(VkRenderPass renderPass);

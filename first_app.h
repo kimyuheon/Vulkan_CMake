@@ -60,7 +60,7 @@ namespace lot {
 
             std::unique_ptr<SimpleRenderSystem> simpleRenderSystem;
             std::unique_ptr<PointLightSystem> pointLightSystem;
-            std::vector<LotGameObject> gameObjects;
+            LotGameObject::Map gameObjects;
             ObjectSelectionManager selectionManager;
     };
 

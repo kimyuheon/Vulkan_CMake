@@ -34,9 +34,9 @@ namespace lot {
 
         void handleMouseClick(GLFWwindow* window,
                             const LotCamera& camera,
-                            std::vector<LotGameObject>& gameObjects);
+                            LotGameObject::Map& gameObjects);
 
-        void clearAllSelections(std::vector<LotGameObject>& gameObjects);
+        void clearAllSelections(LotGameObject::Map& gameObjects);
 
         bool isObjectSelected(const LotGameObject& object) const;
 
@@ -45,11 +45,10 @@ namespace lot {
         }
 
         void selectObject(LotGameObject::id_t objectId,
-                         std::vector<LotGameObject>& gameObjects,
+                         LotGameObject::Map& gameObjects,
                          bool multiSelect = false);
 
-        void deselectObject(LotGameObject::id_t objectId,
-                          std::vector<LotGameObject>& gameObjects);
+        void deselectObject(LotGameObject::id_t objectId, LotGameObject::Map& gameObjects);
 
     private:
         Ray screenToWorldRay(double mouseX, double mouseY,
@@ -62,11 +61,9 @@ namespace lot {
 
         BoundingBox calculateBoundingBox(const LotGameObject& object);
 
-        LotGameObject* findIntersectedObject(const Ray& ray,
-                                           std::vector<LotGameObject>& gameObjects);
+        LotGameObject* findIntersectedObject(const Ray& ray, LotGameObject::Map& gameObjects);
 
-        LotGameObject* findClosestObjectInScreenSpace(const Ray& ray,
-                                                    std::vector<LotGameObject>& gameObjects);
+        LotGameObject* findClosestObjectInScreenSpace(const Ray& ray, LotGameObject::Map& gameObjects);
 
         glm::vec2 projectToScreen(const glm::vec3& worldPos, const Ray& ray);
 

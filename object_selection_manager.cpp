@@ -10,7 +10,7 @@ namespace lot {
 
     void ObjectSelectionManager::handleMouseClick(GLFWwindow* window,
                                                 const LotCamera& camera,
-                                                std::vector<LotGameObject>& gameObjects) {
+                                                LotGameObject::Map& gameObjects) {
 
         // 카메라 저장 (투영 계산에 필요)
         currentCamera = &camera;
@@ -54,8 +54,9 @@ namespace lot {
         }
     }
 
-    void ObjectSelectionManager::clearAllSelections(std::vector<LotGameObject>& gameObjects) {
-        for (auto& obj : gameObjects) {
+    void ObjectSelectionManager::clearAllSelections(LotGameObject::Map& gameObjects) {
+        for (auto& kv : gameObjects) {
+            auto& obj = kv.second;
             obj.isSelected = false;
         }
         selectedObjectIds.clear();
@@ -66,13 +67,14 @@ namespace lot {
     }
 
     void ObjectSelectionManager::selectObject(LotGameObject::id_t objectId,
-                                            std::vector<LotGameObject>& gameObjects,
+                                            LotGameObject::Map& gameObjects,
                                             bool multiSelect) {
         if (!multiSelect) {
             clearAllSelections(gameObjects);
         }
 
-        for (auto& obj : gameObjects) {
+        for (auto& kv : gameObjects) {
+            auto& obj = kv.second;
             if (obj.getId() == objectId) {
                 obj.isSelected = true;
                 selectedObjectIds.insert(objectId);
@@ -82,8 +84,9 @@ namespace lot {
     }
 
     void ObjectSelectionManager::deselectObject(LotGameObject::id_t objectId,
-                                              std::vector<LotGameObject>& gameObjects) {
-        for (auto& obj : gameObjects) {
+                                              LotGameObject::Map& gameObjects) {
+        for (auto& kv : gameObjects) {
+            auto& obj = kv.second;
             if (obj.getId() == objectId) {
                 obj.isSelected = false;
                 selectedObjectIds.erase(objectId);
@@ -265,12 +268,12 @@ namespace lot {
     }
 
     LotGameObject* ObjectSelectionManager::findIntersectedObject(const Ray& ray,
-                                                              std::vector<LotGameObject>& gameObjects) {
+                                                                 LotGameObject::Map& gameObjects) {
         return findClosestObjectInScreenSpace(ray, gameObjects);
     }
 
     LotGameObject* ObjectSelectionManager::findClosestObjectInScreenSpace(const Ray& ray,
-                                                                        std::vector<LotGameObject>& gameObjects) {
+                                                                          LotGameObject::Map& gameObjects) {
         LotGameObject* closestObject = nullptr;
         float bestSelectionScore = std::numeric_limits<float>::max();
 
@@ -278,7 +281,8 @@ namespace lot {
         glm::vec2 mouseScreenPos = glm::vec2(lastMouseX, lastMouseY);
 
 
-        for (auto& obj : gameObjects) {
+        for (auto& kv : gameObjects) {
+            auto& obj = kv.second;
             if (!obj.model) continue;
 
             bool isSelected = false;
