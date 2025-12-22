@@ -1,4 +1,4 @@
-# Vulkan(PointLight) - Point Light 시각화 및 Validation 경고 해결 
+# Vulkan(PointLight) - 여섯 개의 Point Light 회전 
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -86,7 +86,7 @@ Tool : Visual Studio Code
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/1204b9c5-9a41-47b4-a0bf-caa7e04044d8                    
+        https://github.com/user-attachments/assets/6f47e217-ee22-42bf-8769-0fe5664b3b7c                    
     
   - MacOS
       - 실행방법  
@@ -98,7 +98,7 @@ Tool : Visual Studio Code
         <kbd>test@MacBookPro build % </kbd> export VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
         <kbd>test@MacBookPro build % </kbd> ./VulkanApp 
 
-        https://github.com/user-attachments/assets/6cf44368-ef8b-4d5f-a196-db9a2be352fa          
+        https://github.com/user-attachments/assets/a067ff83-8dbe-4333-af61-0a1c48ce8c80            
         
   - Linux(Ubuntu)
       - 실행방법  
