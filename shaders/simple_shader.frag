@@ -45,8 +45,12 @@ void main(){
         // 조명이 켜져 있을 때: 방향성 조명 계산
         // 각 프레임마다 빛까지의 방향 계산
         vec3 diffuseLight = vec3(0.0);
+        vec3 specularLight = vec3(0.0);
         vec3 ambientLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
         vec3 normalWorld = normalize(fragNormalWorld);
+
+        vec3 cameraRightWorld = ubo.inverseView[3].xyz;
+        vec3 viewDirection = normalize(cameraRightWorld - fragNormalWorld);
 
         for(int i = 0; i < ubo.numLights; i++) {
             PointLight light = ubo.pointLights[i];
@@ -61,9 +65,15 @@ void main(){
             float cosAngIncidence = max(dot(normalWorld, directionToLightNorm), 0);
 
             diffuseLight += lightColor * cosAngIncidence;
+
+            vec3 halfAngle = normalize(directionToLightNorm + viewDirection);
+            float blinnTerm = dot(normalWorld, halfAngle);
+            blinnTerm = clamp(blinnTerm, 0.0, 1.0);
+            blinnTerm = pow(blinnTerm, 32.0);
+            specularLight += lightColor * blinnTerm;
         } 
 
-        finalColor = (diffuseLight + ambientLight) * baseColor;
+        finalColor = (diffuseLight + ambientLight) * baseColor + specularLight;
     } else {
         // 조명이 꺼져 있을 때: 균일한 밝기 (플랫 셰이딩)
         finalColor = baseColor * 0.8;
