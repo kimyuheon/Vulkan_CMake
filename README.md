@@ -1,4 +1,4 @@
-# Vulkan(PointLight) - Point Light 시각화 및 Validation 경고 해결 
+# Vulkan(PointLight) - Specular Lighting 반사광 적용 
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -86,7 +86,7 @@ Tool : Visual Studio Code
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/1204b9c5-9a41-47b4-a0bf-caa7e04044d8                    
+        https://github.com/user-attachments/assets/86a67c5c-196e-46ce-a4e0-e666575b030c                      
     
   - MacOS
       - 실행방법  
@@ -98,7 +98,7 @@ Tool : Visual Studio Code
         <kbd>test@MacBookPro build % </kbd> export VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
         <kbd>test@MacBookPro build % </kbd> ./VulkanApp 
 
-        https://github.com/user-attachments/assets/6cf44368-ef8b-4d5f-a196-db9a2be352fa          
+        https://github.com/user-attachments/assets/48744e89-b343-484a-aeb4-ee20c7b3dff9          
         
   - Linux(Ubuntu)
       - 실행방법  
@@ -111,6 +111,6 @@ Tool : Visual Studio Code
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export XDG_SESSION_TYPE=x11  // x11 창 선택  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp  
 
-        https://github.com/user-attachments/assets/2c9c8b2a-79ff-4b04-80f7-ea27ab1842c2    
+        https://github.com/user-attachments/assets/dc468743-0f05-44bd-a95f-b461e0081ee9    
         
 
