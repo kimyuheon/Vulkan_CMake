@@ -29,5 +29,8 @@ void main() {
     if (dis >= 1.0) {
         discard;
     }
-    outColor = vec4(push.color.xyz, 1.0);
+
+    // 수정: 거리 기반 알파 감쇠
+    float cosDis = 0.5 * (cos(dis * 3.14159265) + 1.0);
+    outColor = vec4(push.color.xyz + cosDis, cosDis);
 }

@@ -10,6 +10,7 @@
 #include <array>
 #include <cassert>
 #include <stdexcept>
+#include <map>
 
 namespace lot {
     struct PointLightPushConstants {
@@ -52,6 +53,7 @@ namespace lot {
 
         PipelineConfigInfo pipelineConfig{};
         LotPipeline::defaultPipelineConfigInfo(pipelineConfig);
+        LotPipeline::enableAlphaBlending(pipelineConfig);
         pipelineConfig.attributeDescription.clear();
         pipelineConfig.bindingDescription.clear();
         pipelineConfig.renderPass = renderPass;
@@ -83,6 +85,18 @@ namespace lot {
     }
 
     void PointLightSystem::render(FrameInfo& frameInfo) {
+        std::map<float, LotGameObject::id_t> sorted;
+
+        for (auto& kv : frameInfo.Objects) {
+            auto& obj = kv.second;
+            if (obj.pointLight == nullptr) continue;
+
+            // 카메라로부터의 거리 계산
+            auto offset = frameInfo.camera.getPosition() - obj.transform.translation;
+            float disSquard = glm::dot(offset, offset);
+            sorted[disSquard] = obj.getId();
+        }
+
         lotPipeline->bind(frameInfo.commandBuffer);
         
         vkCmdBindDescriptorSets(
