@@ -119,4 +119,133 @@ namespace lot {
         // 4. 회전된 방향으로 뷰 설정
         setViewDirection(position, rotatedDirection, rotatedUp);
     }
+    
+    // CAD 관련
+    void LotCamera::orbitAroundTarget(float deltaX, float deltaY) {
+        glm::mat4 rotMatrix4 = glm::mat4_cast(orbitRotation);
+        glm::mat3 rotMatrix = glm::mat3(rotMatrix4);
+
+        glm::vec3 right = rotMatrix * glm::vec3(1, 0, 0);
+        glm::vec3 up = rotMatrix * glm::vec3(0, 1, 0);
+
+        glm::quat pitchQuat = glm::angleAxis(deltaY, right);
+        glm::quat yawQuat = glm::angleAxis(deltaX, up);
+
+        orbitRotation = glm::normalize(yawQuat * pitchQuat * orbitRotation);
+
+        updateCadView();
+    }
+
+    void LotCamera::zoomToTarget(float delta, bool isOrtho, glm::vec3* mouseWorldPos) {
+        if (isOrtho) {
+            float oldSize = orthographicSize;
+            orthographicSize -= delta * 0.5f;
+            orthographicSize = glm::clamp(orthographicSize, 0.1f, 50.0f);
+
+            if (mouseWorldPos) {
+                // 마우스 위치를 타겟 평면에 투영
+                glm::mat3 rotMatrix = glm::mat3(glm::mat4_cast(orbitRotation));
+                glm::vec3 forward = rotMatrix * glm::vec3(0.0f, 0.0f, 1.0f);
+
+                // 마우스 레이와 타겟 평면의 교차점 계산
+                float t = glm::dot(targetPosition - *mouseWorldPos, forward) / glm::dot(forward, forward);
+                glm::vec3 mouseOnPlane = *mouseWorldPos + forward * t;
+
+                float zoomRatio = orthographicSize / oldSize;
+                glm::vec3 toMouse = mouseOnPlane - targetPosition;
+                targetPosition += toMouse * (1.0f - zoomRatio);
+            }
+        } else {
+            float oldDistance = orbitDistance;
+            orbitDistance -= delta;
+            orbitDistance = glm::max(orbitDistance, 0.5f);
+            if (mouseWorldPos) {
+                // 마우스 위치를 타겟 평면에 투영
+                glm::mat3 rotMatrix = glm::mat3(glm::mat4_cast(orbitRotation));
+                glm::vec3 forward = rotMatrix * glm::vec3(0.0f, 0.0f, 1.0f);
+
+                // 마우스 레이와 타겟 평면의 교차점 계산
+                float t = glm::dot(targetPosition - *mouseWorldPos, forward) / glm::dot(forward, forward);
+                glm::vec3 mouseOnPlane = *mouseWorldPos + forward * t;
+
+                float zoomRatio = orbitDistance / oldDistance;
+                glm::vec3 toMouse = mouseOnPlane - targetPosition;
+                targetPosition += toMouse * (1.0f - zoomRatio);
+            }
+        }
+        updateCadView();
+    }
+
+    void LotCamera::panTarget(float deltaX, float deltaY, bool isOrtho, float aspect) {
+        glm::mat3 roMatrix = glm::mat3(glm::mat4_cast(orbitRotation));
+
+        glm::vec3 right = roMatrix * glm::vec3(1.0f, 0.0f, 0.0f); // 로컬 X
+        glm::vec3 up = roMatrix * glm::vec3(0.0f, -1.0f, 0.0f);   // 로컬 Y
+
+        if (isOrtho) {
+            targetPosition += right * deltaX * orthographicSize * aspect + 
+                              up * deltaY * orthographicSize;
+        } else {
+            float scale = (orbitDistance) * glm::tan(glm::radians(25.0f));
+            targetPosition += (right * deltaX + up * deltaY) * scale;
+        }
+
+        updateCadView();
+    }
+
+    void LotCamera::setTarget(glm::vec3 newTarget) {
+        targetPosition = newTarget;
+        updateCadView();
+    }
+
+    void LotCamera::updateCadView() {
+        glm::mat4 rotMatrix4 = glm::mat4_cast(orbitRotation);
+        glm::mat3 rotMatrix = glm::mat3(rotMatrix4);
+
+        // 기본 방향 벡터(카메라 -Z 방향)
+        glm::vec3 defaultForward = glm::vec3(0.0f, 0.0f, 1.0f);
+        glm::vec3 defaultUp = glm::vec3(0.0f, -1.0f, 0.0f);
+
+        // 회전 적용된 방향 벡터
+        glm::vec3 forward = rotMatrix * defaultForward;
+        glm::vec3 up = rotMatrix * defaultUp;
+
+        // 타켓으로부터 orbitDistance 만큼 위치 계산
+        glm::vec3 cameraPosition = targetPosition - forward * orbitDistance;
+
+        // 카메라가 타겟을 바라보도록 설정
+        setViewTarget(cameraPosition, targetPosition, up);
+    }
+
+    void LotCamera::resetCadRotation(CadViewType viewType) {
+        
+        orbitDistance = 10.0f;  // 초기 거리로 리셋
+        targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);  // 원점으로 리셋
+
+        switch (viewType)
+        {
+        case CadViewType::Top:
+            // Top View (평면도) - X축 기준 -90도 회전하여 위에서 아래를 내려다봄
+            orbitRotation = glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            break;
+        case CadViewType::Front:
+            // Front View (정면도) - 기본 방향
+            orbitRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+            break;
+        case CadViewType::Right:
+            // Right View (우측면도) - Y -90도
+            orbitRotation = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            break;
+        case CadViewType::Isometric:
+            // 입체뷰
+            glm::quat rotX = glm::angleAxis(glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            glm::quat rotY = glm::angleAxis(glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            orbitRotation = rotY * rotX;
+            break;
+        default:
+            break;
+        }
+
+        updateCadView();
+    }
 }

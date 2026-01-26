@@ -321,7 +321,7 @@ namespace lot {
     // 스크롤 콜백 함수 (static)
     void KeyboardMoveCtrl::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
         if (instance) {
-            instance->setScrollDelta(yoffset);
+            instance->scrollDelta += yoffset;
         }
     }
 

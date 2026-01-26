@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
+#include <string>
 
 #include <thread>
 
@@ -104,6 +105,19 @@ namespace lot {
         bool gKeyPressed = false;
         glm::vec3 orbitTarget{0.0f, 0.0f, 0.0f};
 
+        // CAD 모드로 시작
+        camera.setCadMode(true);
+        camera.updateCadView();
+        WinTitleStr = lotWindow.getWindowTitle();
+        
+        if (camera.getCadMode()) {
+            std::string titleStr = WinTitleStr + " [CAD]";
+            glfwSetWindowTitle(lotWindow.getGLFWwindow(), titleStr.c_str());
+        } else {
+            std::string titleStr = WinTitleStr + " [View]";
+            glfwSetWindowTitle(lotWindow.getGLFWwindow(), titleStr.c_str());
+        }
+
         while (!lotWindow.shouldClose()) {
             glfwPollEvents();
 
@@ -112,11 +126,17 @@ namespace lot {
             currentTime = newTime;
 
             float aspect = lotRenderer.getAspectRatio();
+            
+            // 입력 처리(키보드 + CAD 마우스)
+            handleInputs(newTime, viewerObject, camera, cameraCtrl, enableLighting, 
+                         gKeyPressed, projectionType, frameTime, orbitTarget);
+            
+            // FPS 모드일 시 WASD + 마우스
+            if (!camera.getCadMode()) {
+                updateCamera(cameraCtrl, frameTime, viewerObject, orbitTarget, projectionType);
+            }
 
-            // 입력 처리 및 업데이트
-            updateCamera(cameraCtrl, frameTime, viewerObject, orbitTarget, projectionType);
             updateProjection(camera, projectionType, aspect, viewerObject, orbitTarget);
-            handleInputs(newTime, viewerObject, camera, enableLighting, gKeyPressed);
 
             // 렌더링
             if (lotWindow.isUserResizing()) {
@@ -184,48 +204,216 @@ namespace lot {
         );
     }
 
-    void FirstApp::handleInputs(const std::chrono::high_resolution_clock::time_point& currentTime, const LotGameObject& viewerObject, LotCamera& camera,
-                                bool& enableLighting, bool& gKeyPressed) {
+    void FirstApp::handleInputs(const std::chrono::high_resolution_clock::time_point& currentTime, 
+                                LotGameObject& viewerObject, LotCamera& camera, KeyboardMoveCtrl& cameraCtrl, 
+                                bool& enableLighting, 
+                                bool& gKeyPressed, KeyboardMoveCtrl::ProjectionType& projectionType, 
+                                float frameTime, glm::vec3& orbitTarget) {
+        auto* window = lotWindow.getGLFWwindow();
+
         // 객체 선택 처리 (메인 카메라 사용)
-        selectionManager.handleMouseClick(lotWindow.getGLFWwindow(), camera, gameObjects);
+        selectionManager.handleMouseClick(window, camera, gameObjects);
 
         // 키보드 입력 처리
         static bool keyPressed = false;
 
+        // C키: 카메라 모드 전환
+        static bool ckeyPressed = false;
+        if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS && !ckeyPressed) {
+            ckeyPressed = true;
+            camera.setCadMode(!camera.getCadMode());
+            if (camera.getCadMode()) {
+                std::string titleStr = WinTitleStr + " [CAD]";
+                glfwSetWindowTitle(window, titleStr.c_str());
+            } else {
+                std::string titleStr = WinTitleStr + " [View]";
+                glfwSetWindowTitle(window, titleStr.c_str());
+            }
+
+            std::cout << "Cameara mode: " << (camera.getCadMode() ? "CAD" : "FPS") << std::endl;
+        }
+        if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE) {
+            ckeyPressed = false;
+        }
+
+        // O키: 카메라 모드 전환
+        static bool okeyPressed = false;
+        if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !okeyPressed) {
+            okeyPressed = true;
+            if (projectionType == KeyboardMoveCtrl::ProjectionType::Perspective) {
+                projectionType = KeyboardMoveCtrl::ProjectionType::Orthographic;
+                std::cout << "Projection: Orthographics" << std::endl;
+            } else {
+                projectionType = KeyboardMoveCtrl::ProjectionType::Perspective;
+                std::cout << "Projection: Perspective" << std::endl;
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_O) == GLFW_RELEASE) {
+            okeyPressed = false;
+        }
+
+        // R키: 카메라 리셋
+        // 숫자키: CAD 뷰 방향 변경
+        static bool viewKeyPressed = false;
+        if (camera.getCadMode()) {
+            LotCamera::CadViewType viewType;
+            bool hasInput = false;
+            
+            if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+                viewType = LotCamera::CadViewType::Front;
+                hasInput = true;
+            } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+                viewType = LotCamera::CadViewType::Top;
+                hasInput = true;
+            } else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+                viewType = LotCamera::CadViewType::Right;
+                hasInput = true;
+            } else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
+                viewType = LotCamera::CadViewType::Isometric;
+                hasInput = true;
+            }
+            
+            if (hasInput && !viewKeyPressed) {
+                viewKeyPressed = true;
+                camera.resetCadRotation(viewType);
+                std::cout << "CAD View changed!" << std::endl;
+            }
+            
+            if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE &&
+                glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE &&
+                glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE &&
+                glfwGetKey(window, GLFW_KEY_4) == GLFW_RELEASE) {
+                viewKeyPressed = false;
+            }
+        }
+
         // ESC: 모든 선택 해제
-        if (glfwGetKey(lotWindow.getGLFWwindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             selectionManager.clearAllSelections(gameObjects);
         }
 
         // G: 조명 토글
-        if (glfwGetKey(lotWindow.getGLFWwindow(), GLFW_KEY_G) == GLFW_PRESS && !gKeyPressed) {
+        if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS && !gKeyPressed) {
             gKeyPressed = true;
             enableLighting = !enableLighting;
             std::cout << "Lighting " << (enableLighting ? "ENABLED" : "DISABLED") << std::endl;
         }
 
-        if (glfwGetKey(lotWindow.getGLFWwindow(), GLFW_KEY_G) == GLFW_RELEASE) {
+        if (glfwGetKey(window, GLFW_KEY_G) == GLFW_RELEASE) {
             gKeyPressed = false;
         }
 
         // N: 새 큐브 추가
-        if (glfwGetKey(lotWindow.getGLFWwindow(), GLFW_KEY_N) == GLFW_PRESS && !keyPressed) {
+        if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS && !keyPressed) {
             keyPressed = true;
             addNewCube();
             std::cout << "New cube added! Total objects: " << gameObjects.size() << std::endl;
         }
 
         // Delete: 선택된 객체 삭제
-        if (glfwGetKey(lotWindow.getGLFWwindow(), GLFW_KEY_DELETE) == GLFW_PRESS && !keyPressed) {
+        if (glfwGetKey(window, GLFW_KEY_DELETE) == GLFW_PRESS && !keyPressed) {
             keyPressed = true;
             removeSelectedObjects();
             std::cout << "Selected objects removed! Total objects: " << gameObjects.size() << std::endl;
         }
 
         // 키 릴리스 체크
-        if (glfwGetKey(lotWindow.getGLFWwindow(), GLFW_KEY_N) == GLFW_RELEASE &&
-            glfwGetKey(lotWindow.getGLFWwindow(), GLFW_KEY_DELETE) == GLFW_RELEASE) {
+        if (glfwGetKey(window, GLFW_KEY_N) == GLFW_RELEASE &&
+            glfwGetKey(window, GLFW_KEY_DELETE) == GLFW_RELEASE) {
             keyPressed = false;
+        }
+
+        if (camera.getCadMode()) {
+            static double lastMouseX = 0.0f;
+            static double lastMouseY = 0.0f;
+            static bool firstMouse = true;
+            static bool isOrbitingActive = false;
+            static bool isPanningActive = false;
+
+            double currentMouseX, currentMouseY;
+            glfwGetCursorPos(window, &currentMouseX, &currentMouseY);
+
+            if (firstMouse) {
+                lastMouseX = currentMouseX;
+                lastMouseY = currentMouseY;
+                firstMouse = false;
+            }
+
+            float deltaX = static_cast<float>(currentMouseX - lastMouseX);
+            float deltaY = static_cast<float>(currentMouseY - lastMouseY);
+
+            // 우클릭 드래그: Orbit(회전)
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+                if (!isOrbitingActive) {
+                    isOrbitingActive = true;
+                } else {
+                    float rotationSpeed = 0.01f;
+                    camera.orbitAroundTarget(deltaX * rotationSpeed, -deltaY * rotationSpeed);
+                }
+            } else {
+                isOrbitingActive = false;
+            }
+
+            // 중간클릭 드래그: Pan
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+                if (!isPanningActive) {
+                    isPanningActive = true;
+                } else {
+                    int width, height;
+                    glfwGetWindowSize(window, &width, &height);
+                    float aspect = static_cast<float>(width) / static_cast<float>(height);
+
+                    // 픽셀을 NDC 단위로 변환 (-1 ~ 1)
+                    float ndcDeltaX = (2.0f * deltaX) / width;
+                    float ndcDeltaY = (2.0f * deltaY) / height;
+
+                    bool isOrtho = (projectionType == KeyboardMoveCtrl::ProjectionType::Orthographic);
+                    camera.panTarget(-ndcDeltaX, ndcDeltaY, isOrtho, aspect);
+                }
+            } else {
+                isPanningActive = false;
+            }
+
+            // 마우스 휠: Zoom
+            double scroll = cameraCtrl.getScrollDelta();
+            if (scroll != 0.0) {
+                //std::cout << "Mouse Wheel Working!!!" << std::endl;
+                float zoomSpeed = 1.0f;
+                bool isOrtho = (projectionType == KeyboardMoveCtrl::ProjectionType::Orthographic);
+
+                // 마우스 위치의 월드 좌표 계산
+                int width, height;
+                glfwGetWindowSize(window, &width, &height);
+
+                glm::mat4 invProj = glm::inverse(camera.getProjection());
+                glm::mat4 invView = glm::inverse(camera.getView());
+
+                float ndcX = (2.0f * currentMouseX) / width - 1.0f;
+                float ndcY = (2.0f * currentMouseY) / height - 1.0f;
+
+                glm::vec4 clipNear = glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
+                glm::vec4 viewNear = invProj * clipNear;
+                viewNear /= viewNear.w;
+                glm::vec3 worldNear = glm::vec3(invView * viewNear);
+
+                camera.zoomToTarget(static_cast<float>(scroll) * zoomSpeed, isOrtho, &worldNear);
+                cameraCtrl.resetScrollDelta();
+            }
+
+            lastMouseX = currentMouseX;
+            lastMouseY = currentMouseY;
+        } else {
+            // 스크롤 입력
+            cameraCtrl.processScrollInput(window, projectionType, 
+                                          orthoSize, viewerObject, orbitTarget,
+                                          glm::radians(50.f));
+
+            // WASD 이동
+            cameraCtrl.moveInPlaneXZ(window, frameTime, viewerObject);
+
+            // 마우스 카메라 제어
+            cameraCtrl.handleMouseCameraControlWithProjection(window, frameTime, viewerObject, orbitTarget,
+                                                              orthoSize, lotRenderer.getAspectRatio());
         }
 
         // 디버그 출력 (5초마다)
@@ -235,13 +423,15 @@ namespace lot {
     void FirstApp::updateProjection(LotCamera& camera, KeyboardMoveCtrl::ProjectionType projectionType, float aspect, const LotGameObject& viewerObject, const glm::vec3& orbitTarget) {
 
         // 3DS Max 스타일 자유 회전 - 무제한 상하좌우 회전
-        camera.setViewFromTransform(viewerObject.transform.translation, viewerObject.transform.rotation);
-        
+        if (!camera.getCadMode()) {
+            camera.setViewFromTransform(viewerObject.transform.translation, viewerObject.transform.rotation);
+        } 
+
         // 투영 설정 (기존 유지)
         if (projectionType == KeyboardMoveCtrl::ProjectionType::Perspective) {
             camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.01f, 100.f);
         } else {
-            float orthoSize = 1.0f;
+            float orthoSize = camera.getOrthoSize();
             camera.setOrthographicProjection(
                 -orthoSize * aspect, orthoSize * aspect,
                 -orthoSize, orthoSize,

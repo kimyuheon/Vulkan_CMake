@@ -21,6 +21,7 @@ namespace lot {
             bool wasWindowReSized() { return framebufferResized; }
             void resetWindowResizedFlag() { framebufferResized = false; }
             GLFWwindow* getGLFWwindow() { return window; }
+            std::string getWindowTitle() { return windowName; }
 
             void createWindowSurface(VkInstance instance, VkSurfaceKHR *surfacec_);
 

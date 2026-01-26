@@ -41,9 +41,13 @@ namespace lot {
             void updateCamera(KeyboardMoveCtrl& cameraCtrl, float frameTime,
                              LotGameObject& viewerObject, glm::vec3& orbitTarget,
                              KeyboardMoveCtrl::ProjectionType projectionType);
-            void handleInputs(const std::chrono::high_resolution_clock::time_point& currentTime, const LotGameObject& viewerObject, LotCamera& camera,
-                              bool& enableLighting, bool& gKeyPressed);
-            void updateProjection(LotCamera& camera, KeyboardMoveCtrl::ProjectionType projectionType, float aspect, const LotGameObject& viewerObject, const glm::vec3& orbitTarget);
+            void handleInputs(const std::chrono::high_resolution_clock::time_point& currentTime, 
+                              LotGameObject& viewerObject, LotCamera& camera, KeyboardMoveCtrl& cameraCtrl,
+                              bool& enableLighting, 
+                              bool& gKeyPressed, KeyboardMoveCtrl::ProjectionType& projectionType,
+                              float frameTime, glm::vec3& orbitTarget);
+            void updateProjection(LotCamera& camera, KeyboardMoveCtrl::ProjectionType projectionType, float aspect, 
+                                  const LotGameObject& viewerObject, const glm::vec3& orbitTarget);
             void handleResizing();
             //void render(SimpleRenderSystem& renderSystem, LotCamera& camera, bool enableLighting);
             void printDebugInfo(const std::chrono::high_resolution_clock::time_point& currentTime,
@@ -62,6 +66,9 @@ namespace lot {
             std::unique_ptr<PointLightSystem> pointLightSystem;
             LotGameObject::Map gameObjects;
             ObjectSelectionManager selectionManager;
+
+            float orthoSize{5.0f};
+            std::string WinTitleStr;
     };
 
 } // namespace lot

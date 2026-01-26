@@ -112,7 +112,7 @@ namespace lot {
         // 3. 카메라 월드 위치 추출
         // 뷰 매트릭스 역변환의 네 번째 열이 카메라의 월드 위치
         glm::mat4 invView = glm::inverse(viewMatrix);
-        glm::vec3 cameraPos = glm::vec3(invView[3][0], invView[3][1], invView[3][2]);
+        //glm::vec3 cameraPos = glm::vec3(invView[3][0], invView[3][1], invView[3][2]);
 
         // 4. Near/Far 평면에서의 클립 공간 좌표 생성
         // z = -1 (near plane), z = 1 (far plane)
@@ -143,7 +143,7 @@ namespace lot {
 
         // 9. 최종 레이 생성: Ray(origin, direction)
         Ray ray;
-        ray.origin = cameraPos;      // 카메라 위치에서 시작
+        ray.origin = worldNear;      // 카메라 위치에서 시작
         ray.direction = rayDirection; // 정규화된 방향 벡터
 
         return ray;

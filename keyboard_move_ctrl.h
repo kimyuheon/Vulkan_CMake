@@ -53,6 +53,8 @@ namespace lot {
                 std::cout << "KeyboardMoveCtrl constructor called" << std::endl;
             }
 
+            static KeyboardMoveCtrl* getInstance() {return instance; }
+
             // 제어 함수
             void moveInPlaneXZ(GLFWwindow* window, float dt, LotGameObject& gameObject);
             void rotateObjects(GLFWwindow* window, float dt, LotGameObject::Map& objects);
@@ -80,16 +82,18 @@ namespace lot {
 
             // 스크롤 관련 함수
             void processScrollInput(GLFWwindow* window, ProjectionType projType, 
-                           float& orthoSize, LotGameObject& cameraObject, 
-                           glm::vec3& targetPoint, float fov = glm::radians(50.0f));
+                                    float& orthoSize, LotGameObject& cameraObject, 
+                                    glm::vec3& targetPoint, float fov = glm::radians(50.0f));
             static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
             static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+            double getScrollDelta() const { return scrollDelta; }
             void setScrollDelta(double delta) { scrollDelta = delta; }
             void setMouseDelta(double deltaX, double deltaY) {
                 mouseDeltaX = deltaX;
                 mouseDeltaY = deltaY;
             }
             static void setInstance(KeyboardMoveCtrl* inst);
+            void resetScrollDelta() { scrollDelta = 0.0f; }
 
             KeyMappings keys{};
             float moveSpeed{3.f};
