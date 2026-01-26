@@ -237,11 +237,13 @@ namespace lot {
             orbitRotation = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             break;
         case CadViewType::Isometric:
+        {
             // 입체뷰
             glm::quat rotX = glm::angleAxis(glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
             glm::quat rotY = glm::angleAxis(glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             orbitRotation = rotY * rotX;
             break;
+        }
         default:
             break;
         }
