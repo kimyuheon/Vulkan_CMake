@@ -74,19 +74,23 @@ Tool : Visual Studio Code
 - 실행결과
   - 좌표계를 오일러에서 쿼터시안으로 변경
   - 선택 시 노란색으로 객체 색상 변경
-  - 마우스 휠 버튼 : 줌 확대/축소
+  - 마우스 휠 버튼 : 마우스 커서 중심으로 확대/축소
   - 마우스 좌측 버튼 : 선택
   - 마우스 우측 버튼 : 회전
   - N : 랜덤생성
   - Delete : 선택된 객체 삭제
   - G : 조명 OnOff
+  - O : 뷰모드(Orthographic/Perspective) 
+  - C : CAD / FPS 모드
+  - 1/2/3/4 : 평면도 / 정면도 / 우측면도 / ISO
+  
   ---  
   - 윈도우  
       - 실행방법    
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/1204b9c5-9a41-47b4-a0bf-caa7e04044d8                    
+        https://github.com/user-attachments/assets/6a19f5d0-6cc6-4711-a78e-fc0f556d5098                    
     
   - MacOS
       - 실행방법  
