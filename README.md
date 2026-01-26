@@ -1,4 +1,4 @@
-# Vulkan(PointLight) - Point Light 시각화 및 Validation 경고 해결 
+# Vulkan - CAD VIEW MODE 
 
 Tool : Visual Studio Code
 - 파일 구조
