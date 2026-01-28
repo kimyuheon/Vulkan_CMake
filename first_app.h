@@ -11,6 +11,7 @@
 #include "point_light_system.h"
 #include "lot_buffer.h"
 #include "lot_descriptors.h"
+#include "sketch_manager.h"
 
 #include <memory>
 #include <vector>
@@ -19,6 +20,7 @@
 #include <glm/glm.hpp>
 
 namespace lot {
+    std::unique_ptr<LotModel> createCubeMode(LotDevice& device, glm::vec3 offset);
     class FirstApp {
         public:
             static constexpr int WIDTH = 800;
@@ -52,6 +54,7 @@ namespace lot {
             //void render(SimpleRenderSystem& renderSystem, LotCamera& camera, bool enableLighting);
             void printDebugInfo(const std::chrono::high_resolution_clock::time_point& currentTime,
                                const LotGameObject& viewerObject, bool enableLighting);
+            void renderSketchPreview(FrameInfo& frameInfo);
 
             LotWindow lotWindow{ WIDTH, HEIGHT, "Hellow Lot Vulkan!!!" };
             LotDevice lotDevice{ lotWindow };
@@ -69,6 +72,10 @@ namespace lot {
 
             float orthoSize{5.0f};
             std::string WinTitleStr;
+
+            // SketchManager
+            SketchManager sketchmanager{ lotDevice };
+            std::shared_ptr<LotModel> sharedCubeModel;
     };
 
 } // namespace lot

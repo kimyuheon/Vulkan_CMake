@@ -40,6 +40,8 @@ namespace lot {
             void setTarget(glm::vec3 newTarget);
             void updateCadView();
             void resetCadRotation(CadViewType viewType = CadViewType::Top);  // 뷰 리셋 기능
+            CadViewType getCurrentViewType() const { return currentViewType; }
+            glm::vec3 getTarget() const { return targetPosition; }
 
             const glm::mat4& getProjection() const { return projectionMatrix; }
             const glm::mat4& getView() const { return viewMatrix; }
@@ -58,5 +60,6 @@ namespace lot {
             float orbitDistance{10.f};
             glm::quat orbitRotation{1.0f, 0.0f, 0.0f, 0.0f};  // 누적 회전 (쿼터니언) #include <glm/gtc/quaternion.hpp>
             float orthographicSize{5.f};
+            CadViewType currentViewType{CadViewType::Front};  // 현재 CAD 뷰 타입
     };
 } // namespace lot

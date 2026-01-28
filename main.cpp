@@ -8,8 +8,17 @@
 #include <iostream>
 #include <stdexcept>
 
+#ifdef _WIN32
+  #include <Windows.h>
+#endif
+
 int main() {
-  lot::FirstApp app{};
+  #ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+  #endif
+    std::setlocale(LC_ALL, "en_US.UTF-8");
+  
+    lot::FirstApp app{};
 
   try {
     app.run();

@@ -218,7 +218,8 @@ namespace lot {
     }
 
     void LotCamera::resetCadRotation(CadViewType viewType) {
-        
+        currentViewType = viewType;  // 현재 뷰 타입 저장
+
         orbitDistance = 10.0f;  // 초기 거리로 리셋
         targetPosition = glm::vec3(0.0f, 0.0f, 0.0f);  // 원점으로 리셋
 

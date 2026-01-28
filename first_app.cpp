@@ -7,6 +7,7 @@
 #include "lot_buffer.h"
 #include "lot_descriptors.h"
 #include "lot_frame_info.h"
+#include "sketch_manager.h"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -31,6 +32,9 @@
 namespace lot {
     FirstApp::FirstApp() { 
         loadGameObjects(); 
+
+        sharedCubeModel = createCubeMode(lotDevice, {0.0f, 0.0f, 0.0f});
+        sketchmanager.setCubeModel(sharedCubeModel);
 
         // DescriptorSetLayout
         globalSetLayout = LotDescriptorSetLayout::Builder(lotDevice)
@@ -167,8 +171,12 @@ namespace lot {
                 uboBuffers[frameIndex]->flush();
                 
                 lotRenderer.beginSwapChainRenderPass(commandBuffer);
-
+                
                 simpleRenderSystem->renderGameObjects(frameInfo);
+
+                if (sketchmanager.isSketchActive())
+                    renderSketchPreview(frameInfo);
+
                 pointLightSystem->render(frameInfo);
                 simpleRenderSystem->renderHighlights(frameInfo);
                 lotRenderer.endSwapChainRenderPass(commandBuffer);
@@ -213,6 +221,21 @@ namespace lot {
 
         // 객체 선택 처리 (메인 카메라 사용)
         selectionManager.handleMouseClick(window, camera, gameObjects);
+
+        // B키: 스케치 모드 시작
+        static bool bKeyPressed = false;
+        if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !bKeyPressed) {
+            bKeyPressed = true;
+            if (!sketchmanager.isSketchActive()) {
+                sketchmanager.startSketch();
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE) {
+            bKeyPressed = false;
+        } 
+
+        // 스케치 매니저 업데이트p
+        sketchmanager.handleInput(window, camera, gameObjects);
 
         // 키보드 입력 처리
         static bool keyPressed = false;
@@ -388,8 +411,8 @@ namespace lot {
                 glm::mat4 invProj = glm::inverse(camera.getProjection());
                 glm::mat4 invView = glm::inverse(camera.getView());
 
-                float ndcX = (2.0f * currentMouseX) / width - 1.0f;
-                float ndcY = (2.0f * currentMouseY) / height - 1.0f;
+                float ndcX = static_cast<float>((2.0f * currentMouseX) / width - 1.0f);
+                float ndcY = static_cast<float>((2.0f * currentMouseY) / height - 1.0f);
 
                 glm::vec4 clipNear = glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
                 glm::vec4 viewNear = invProj * clipNear;
@@ -490,6 +513,22 @@ namespace lot {
                       << " z=" << viewerObject.transform.rotation.z << std::endl;
             lastCameraDebug = currentTime;
         }
+    }
+
+    void FirstApp::renderSketchPreview(FrameInfo& frameInfo) {
+        auto& previewMap = sketchmanager.getPreviewMap();
+        if (previewMap.empty()) return;
+
+        FrameInfo previewFrameInfo{
+            frameInfo.frameIndex,
+            frameInfo.frameTime,
+            frameInfo.commandBuffer,
+            frameInfo.camera,
+            frameInfo.globalDescriptorSet,
+            previewMap
+        };
+
+        simpleRenderSystem->renderGameObjects(previewFrameInfo);
     }
 
     std::unique_ptr<LotModel> createCubeMode(LotDevice& device, glm::vec3 offset) {
