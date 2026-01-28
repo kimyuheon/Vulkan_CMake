@@ -1,4 +1,4 @@
-# Vulkan - CAD VIEW MODE 
+# Vulkan - CAD - CUBE
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -83,7 +83,8 @@ Tool : Visual Studio Code
   - O : 뷰모드(Orthographic/Perspective) 
   - C : CAD / FPS 모드
   - 1/2/3/4 : 평면도 / 정면도 / 우측면도 / ISO
-  
+  - B : 큐브 그리기
+
   ---  
   - 윈도우  
       - 실행방법    
