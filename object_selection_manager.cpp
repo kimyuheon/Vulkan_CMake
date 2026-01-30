@@ -54,6 +54,11 @@ namespace lot {
         }
     }
 
+    void ObjectSelectionManager::syncMouseState(GLFWwindow* window) {
+        int leftState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+        leftMousePressed = (leftState == GLFW_PRESS);
+    }
+
     void ObjectSelectionManager::clearAllSelections(LotGameObject::Map& gameObjects) {
         for (auto& kv : gameObjects) {
             auto& obj = kv.second;

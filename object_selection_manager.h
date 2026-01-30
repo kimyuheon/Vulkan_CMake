@@ -50,6 +50,9 @@ namespace lot {
 
         void deselectObject(LotGameObject::id_t objectId, LotGameObject::Map& gameObjects);
 
+        // 마우스 상태 동기화 (스케치 모드 등에서 사용)
+        void syncMouseState(GLFWwindow* window);
+
     private:
         Ray screenToWorldRay(double mouseX, double mouseY,
                            int windowWidth, int windowHeight,

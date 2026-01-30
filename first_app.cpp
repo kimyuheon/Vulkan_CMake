@@ -228,8 +228,12 @@ namespace lot {
         auto* window = lotWindow.getGLFWwindow();
 
         // 객체 선택 처리 (메인 카메라 사용)
-        if (!sketchmanager.isSketchActive())
+        if (!sketchmanager.isSketchActive()) {
             selectionManager.handleMouseClick(window, camera, gameObjects);
+        } else {
+            // 스케치 모드 중 마우스 상태 동기화 (스케치 완료 시 클릭이 선택으로 처리되지 않도록)
+            selectionManager.syncMouseState(window);
+        }
 
         // B키: 스케치 모드 시작
         static bool bKeyPressed = false;
