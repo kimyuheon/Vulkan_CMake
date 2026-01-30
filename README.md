@@ -105,7 +105,7 @@ Tool : Visual Studio Code
         <kbd>test@MacBookPro build % </kbd> export VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
         <kbd>test@MacBookPro build % </kbd> ./VulkanApp 
 
-        https://github.com/user-attachments/assets/65f2c866-5f44-4965-b841-53f78207e85f  
+        https://github.com/user-attachments/assets/87199165-0bd9-4481-840e-6ad8b49c2362  
         
   - Linux(Ubuntu)
       - 실행방법  
