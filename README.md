@@ -70,6 +70,8 @@ Tool : Visual Studio Code
 
 - 수정사항  
   - 선택 오류 수정 : 모델의 실제 버텍스로부터 바운딩박스 계산
+  - 제목 표시줄 (Orthographic/Perspective) 표시
+  - 뷰별로 큐브 그리기
 
 - 실행결과
   - 좌표계를 오일러에서 쿼터시안으로 변경
@@ -91,7 +93,7 @@ Tool : Visual Studio Code
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/6a19f5d0-6cc6-4711-a78e-fc0f556d5098                    
+        https://github.com/user-attachments/assets/c01a49ca-fdf8-439f-9751-553695b2dba4                    
     
   - MacOS
       - 실행방법  

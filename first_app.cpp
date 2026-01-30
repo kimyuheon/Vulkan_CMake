@@ -116,9 +116,17 @@ namespace lot {
         
         if (camera.getCadMode()) {
             std::string titleStr = WinTitleStr + " [CAD]";
+            if (projectionType == KeyboardMoveCtrl::ProjectionType::Perspective)
+                    titleStr += "[Perspective]";
+                else
+                    titleStr += "[Orthographic]";
             glfwSetWindowTitle(lotWindow.getGLFWwindow(), titleStr.c_str());
         } else {
             std::string titleStr = WinTitleStr + " [View]";
+            if (projectionType == KeyboardMoveCtrl::ProjectionType::Perspective)
+                    titleStr += "[Perspective]";
+                else
+                    titleStr += "[Orthographic]";
             glfwSetWindowTitle(lotWindow.getGLFWwindow(), titleStr.c_str());
         }
 
@@ -220,13 +228,15 @@ namespace lot {
         auto* window = lotWindow.getGLFWwindow();
 
         // 객체 선택 처리 (메인 카메라 사용)
-        selectionManager.handleMouseClick(window, camera, gameObjects);
+        if (!sketchmanager.isSketchActive())
+            selectionManager.handleMouseClick(window, camera, gameObjects);
 
         // B키: 스케치 모드 시작
         static bool bKeyPressed = false;
         if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !bKeyPressed) {
             bKeyPressed = true;
             if (!sketchmanager.isSketchActive()) {
+                selectionManager.clearAllSelections(gameObjects);
                 sketchmanager.startSketch();
             }
         }
@@ -247,9 +257,17 @@ namespace lot {
             camera.setCadMode(!camera.getCadMode());
             if (camera.getCadMode()) {
                 std::string titleStr = WinTitleStr + " [CAD]";
+                if (projectionType == KeyboardMoveCtrl::ProjectionType::Perspective)
+                    titleStr += "[Perspective]";
+                else
+                    titleStr += "[Orthographic]";
                 glfwSetWindowTitle(window, titleStr.c_str());
             } else {
                 std::string titleStr = WinTitleStr + " [View]";
+                if (projectionType == KeyboardMoveCtrl::ProjectionType::Perspective)
+                    titleStr += "[Perspective]";
+                else
+                    titleStr += "[Orthographic]";
                 glfwSetWindowTitle(window, titleStr.c_str());
             }
 
@@ -263,13 +281,21 @@ namespace lot {
         static bool okeyPressed = false;
         if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !okeyPressed) {
             okeyPressed = true;
+            std::string titleStr;
+            if (camera.getCadMode())
+                titleStr = WinTitleStr + " [CAD]";
+            else 
+                titleStr = WinTitleStr + " [View]";
             if (projectionType == KeyboardMoveCtrl::ProjectionType::Perspective) {
                 projectionType = KeyboardMoveCtrl::ProjectionType::Orthographic;
                 std::cout << "Projection: Orthographics" << std::endl;
+                titleStr += "[Orthographic]";
             } else {
                 projectionType = KeyboardMoveCtrl::ProjectionType::Perspective;
                 std::cout << "Projection: Perspective" << std::endl;
+                titleStr += "[Perspective]";
             }
+            glfwSetWindowTitle(window, titleStr.c_str());
         }
         if (glfwGetKey(window, GLFW_KEY_O) == GLFW_RELEASE) {
             okeyPressed = false;
