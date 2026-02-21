@@ -9,7 +9,7 @@ Tool : Visual Studio Code
 ├── Project/                        # 메인 프로젝트 폴더
 │   ├── build/                      # 빌드 시 자동 생성
 │   │   └── Debug/
-│   │       ├── models/            # 빌드 시 복사
+│   │       ├── models/             # 빌드 시 복사
 │   │       │   ├── cube.obj
 │   │       │   ├── quad.obj
 │   │       │   └── ...
@@ -21,7 +21,7 @@ Tool : Visual Studio Code
 │   │       │   ├── Tiles_Stone_005_basecolor
 │   │       │   └── ...
 │   │       └── VulkanApp           # 실행파일
-│   ├── models/                    # 원본 셰이더 파일들
+│   ├── models/                     # 원본 셰이더 파일들
 │   │   ├── cube.obj
 │   │   ├── quad.obj
 │   │   └── ...
@@ -86,7 +86,7 @@ Tool : Visual Studio Code
 
 > **Note**: VulkanSdk는 프로젝트 폴더와 같은 레벨에 위치하며, CMakeLists.txt에서 `../VulkanSdk/Win(Linux/Apple)/` 경로로 OS별 참조됩니다.
 
-> **추가**: tiny_obj_loader.h와 stb_image.h를 위의 디렉토리를 보고 OS에 따라 복사해주세요.
+> **추가**: tiny_obj_loader.h와 stb_image.h를 위의 디렉토리를 보고 OS에 따라 복사해주세요.(https://github.com/kimyuheon/Vulkan_CMake/tree/main/include)
 
 - 수정사항  
   - 선택 오류 수정 : 모델의 실제 버텍스로부터 바운딩박스 계산
@@ -117,7 +117,7 @@ Tool : Visual Studio Code
         <kbd>PS D:\programming\vulkan\3dEngine></kbd> cd .\build\Debug\  
         <kbd>PS D:\programming\vulkan\3dEngine\build\Debug></kbd> .\VulkanApp.exe
           
-        https://github.com/user-attachments/assets/c01a49ca-fdf8-439f-9751-553695b2dba4                    
+        https://github.com/user-attachments/assets/0217c609-ec81-4b3e-b904-f0968a046a5d                      
     
   - MacOS
       - 실행방법  
@@ -129,7 +129,7 @@ Tool : Visual Studio Code
         <kbd>test@MacBookPro build % </kbd> export VK_ICD_FILENAMES="/Users/lot700/Desktop/mac_vk/vk_cmake/VulkanSdk/Apple/share/vulkan/icd.d/MoltenVK_icd.json"  
         <kbd>test@MacBookPro build % </kbd> ./VulkanApp 
 
-        https://github.com/user-attachments/assets/87199165-0bd9-4481-840e-6ad8b49c2362  
+        https://github.com/user-attachments/assets/935cf2bd-b806-40ff-ab9e-3253f0d11de2   
         
   - Linux(Ubuntu)
       - 실행방법  
@@ -142,6 +142,6 @@ Tool : Visual Studio Code
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> export XDG_SESSION_TYPE=x11  // x11 창 선택  
         <kbd>test@test-IdeaPad-1-15ALC7:~/Vulkan/3dEngine/build$ </kbd> ./VulkanApp  
 
-        https://github.com/user-attachments/assets/6bea02f9-5e39-4b8d-960e-3abea6a0a85a    
+        https://github.com/user-attachments/assets/0b11fde2-aac8-4eda-a46d-a551a034ed52      
         
 
