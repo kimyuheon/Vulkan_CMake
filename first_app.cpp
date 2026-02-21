@@ -7,6 +7,7 @@
 #include "lot_buffer.h"
 #include "lot_descriptors.h"
 #include "lot_frame_info.h"
+
 #include "sketch_manager.h"
 
 // libs
@@ -28,6 +29,7 @@
 #include <thread>
 
 #define MAX_LIGHTS 10
+#define MAX_TEXTURE_DESCRIPTORS 200
 
 namespace lot {
     FirstApp::FirstApp() { 
@@ -39,6 +41,11 @@ namespace lot {
         // DescriptorSetLayout
         globalSetLayout = LotDescriptorSetLayout::Builder(lotDevice)
         .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+        .build();
+
+        // 텍스처용 Descriptor Set Layout (set=1)
+        textureSetLayout = LotDescriptorSetLayout::Builder(lotDevice)
+        .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
         .build();
 
         // 동적 크기로 변경
@@ -56,8 +63,9 @@ namespace lot {
 
         // Descriptor Pool
         globalPool = LotDescriptorPool::Builder(lotDevice)
-        .setMaxSets(static_cast<uint32_t>(frameCount))
+        .setMaxSets(static_cast<uint32_t>(frameCount) + MAX_TEXTURE_DESCRIPTORS)
         .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, static_cast<uint32_t>(frameCount))
+        .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, MAX_TEXTURE_DESCRIPTORS)
         .build();
 
         // Descriptor Sets
@@ -73,7 +81,8 @@ namespace lot {
         simpleRenderSystem = std::make_unique<SimpleRenderSystem>(
             lotDevice,
             lotRenderer.getSwapChainRenderPass(),
-            globalSetLayout->getDescriptorSetLayout()
+            globalSetLayout->getDescriptorSetLayout(),
+            textureSetLayout->getDescriptorSetLayout()
         );
 
         // PointLightSystem
@@ -82,6 +91,24 @@ namespace lot {
             lotRenderer.getSwapChainRenderPass(),
             globalSetLayout->getDescriptorSetLayout()
         );
+
+        // MaterualManager 초기화
+        materialManager = std::make_unique<MaterialManager>(lotDevice);
+        materialManager->loadMaterialsFromFolder("textures");
+
+        {
+            size_t frameCount = lotRenderer.getFrameCount();
+            auto defaultImageInfo = materialManager->getDefaultTexture()->descriptorInfo();
+            for (auto& kv : gameObjects) {
+                auto& obj = kv.second;
+                obj.textureDescriptorSets.resize(frameCount);
+                for (size_t i = 0; i < frameCount; i++) {
+                    LotDescriptorWriter(*textureSetLayout, *globalPool)
+                    .writeImage(0, &defaultImageInfo)
+                    .build(obj.textureDescriptorSets[i]);
+                }
+            }
+        }
     }
 
     FirstApp::~FirstApp() {
@@ -181,12 +208,13 @@ namespace lot {
                 lotRenderer.beginSwapChainRenderPass(commandBuffer);
                 
                 simpleRenderSystem->renderGameObjects(frameInfo);
+                simpleRenderSystem->renderHighlights(frameInfo);
 
                 if (sketchmanager.isSketchActive())
                     renderSketchPreview(frameInfo);
 
                 pointLightSystem->render(frameInfo);
-                simpleRenderSystem->renderHighlights(frameInfo);
+                
                 lotRenderer.endSwapChainRenderPass(commandBuffer);
 
                 lotRenderer.endFrame();
@@ -248,8 +276,18 @@ namespace lot {
             bKeyPressed = false;
         } 
 
-        // 스케치 매니저 업데이트p
+        // 스케치 매니저 업데이트
+        bool wasActive = sketchmanager.isSketchActive();
         sketchmanager.handleInput(window, camera, gameObjects);
+
+        // 스케치 완료 시 새 객체에 기본 descriptor set 할당
+        if (wasActive && !sketchmanager.isSketchActive()) {
+            for (auto& kv : gameObjects) {
+                if (kv.second.textureDescriptorSets.empty() && kv.second.model) {
+                    assignDefaultDescriptorSets(kv.second);
+                }
+            }
+        }
 
         // 키보드 입력 처리
         static bool keyPressed = false;
@@ -275,7 +313,7 @@ namespace lot {
                 glfwSetWindowTitle(window, titleStr.c_str());
             }
 
-            std::cout << "Cameara mode: " << (camera.getCadMode() ? "CAD" : "FPS") << std::endl;
+            std::cout << "Camera mode: " << (camera.getCadMode() ? "CAD" : "FPS") << std::endl;
         }
         if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE) {
             ckeyPressed = false;
@@ -368,6 +406,93 @@ namespace lot {
             keyPressed = true;
             removeSelectedObjects();
             std::cout << "Selected objects removed! Total objects: " << gameObjects.size() << std::endl;
+        }
+
+        // M: 재질 순환 적용
+        static bool mKeyPressed = false;
+        if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && !mKeyPressed) {
+            mKeyPressed = true;
+
+            auto materials = materialManager->getAvailableMaterials();
+            if (!materials.empty()) {
+                bool hasSelection = false;
+                for (const auto& kv : gameObjects) {
+                    if (kv.second.isSelected) {
+                        hasSelection = true;
+                        break;
+                    }
+                }
+
+                if (hasSelection) {
+                    currentMaterialIndex = (currentMaterialIndex + 1) % materials.size();
+                    std::string materialName = materials[currentMaterialIndex];
+                    materialManager->applyMaterialToSelected(materialName, gameObjects);
+
+                    // 텍스처 Descriptor Set 업데이트
+                    size_t frameCount = lotRenderer.getFrameCount();
+                    for (auto& kv : gameObjects) {
+                        auto& obj = kv.second;
+                        if (obj.isSelected && obj.texture != nullptr) {
+                            obj.textureDescriptorSets.resize(frameCount);
+                            for (size_t i = 0; i < frameCount; i++) {
+                                auto imageInfo = obj.texture->descriptorInfo();
+                                LotDescriptorWriter(*textureSetLayout, *globalPool)
+                                    .writeImage(0, &imageInfo)
+                                    .build(obj.textureDescriptorSets[i]);
+                            }
+                        }
+                    }
+                } else {
+                    std::cout << "No objects selected!" << std::endl;
+                }
+            } else {
+                std::cout << "No materials loaded! Add images to textures/ folder." << std::endl;
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_M) == GLFW_RELEASE) {
+            mKeyPressed = false;
+        }
+
+        // U키 — 재질 제거
+        static bool uKeyPressed = false;
+        if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && !uKeyPressed) {
+            uKeyPressed = true;
+            materialManager->removeMaterialFromSelected(gameObjects);
+        }
+        if (glfwGetKey(window, GLFW_KEY_U) == GLFW_RELEASE) {
+            uKeyPressed = false;
+        }
+
+        // [ 키: 텍스처 확대 (스케일 감소 = 타일이 크게 보임)
+        static bool leftBracketPressed = false;
+        if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS && !leftBracketPressed) {
+            leftBracketPressed = true;
+            for (auto& kv : gameObjects) {
+                auto& obj = kv.second;
+                if (obj.isSelected && obj.texture != nullptr) {
+                    obj.textureScale = std::max(0.1f, obj.textureScale - 0.1f);
+                    std::cout << "Texture scale: " << obj.textureScale << std::endl;
+                }
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_RELEASE) {
+            leftBracketPressed = false;
+        }
+
+        // ] 키: 텍스처 축소 (스케일 증가 = 타일이 작게, 반복 많이)
+        static bool rightBracketPressed = false;
+        if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS && !rightBracketPressed) {
+            rightBracketPressed = true;
+            for (auto& kv : gameObjects) {
+                auto& obj = kv.second;
+                if (obj.isSelected && obj.texture != nullptr) {
+                    obj.textureScale = std::min(10.0f, obj.textureScale + 0.1f);
+                    std::cout << "Texture scale: " << obj.textureScale << std::endl;
+                }
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_RELEASE) {
+            rightBracketPressed = false;
         }
 
         // 키 릴리스 체크
@@ -566,40 +691,40 @@ namespace lot {
         modelBuilder.vertices = {
 
             // left face (white) - normal pointing left (-X)
-            {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}},
-            {{-.5f,  .5f,  .5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}},
-            {{-.5f, -.5f,  .5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}},
-            {{-.5f,  .5f, -.5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}},
+            {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}, {0.f, 0.f}},
+            {{-.5f,  .5f,  .5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}, {1.f, 1.f}},
+            {{-.5f, -.5f,  .5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}, {0.f, 1.f}},
+            {{-.5f,  .5f, -.5f}, {.9f, .9f, .9f}, {-1.f, 0.f, 0.f}, {1.f, 0.f}},
 
             // right face (yellow) - normal pointing right (+X)
-            {{ .5f, -.5f, -.5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}},
-            {{ .5f,  .5f,  .5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}},
-            {{ .5f, -.5f,  .5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}},
-            {{ .5f,  .5f, -.5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}},
+            {{ .5f, -.5f, -.5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}, {0.f, 0.f}},
+            {{ .5f,  .5f,  .5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}, {1.f, 1.f}},
+            {{ .5f, -.5f,  .5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}, {0.f, 1.f}},
+            {{ .5f,  .5f, -.5f}, {.8f, .8f, .1f}, {1.f, 0.f, 0.f}, {1.f, 0.f}},
 
             // top face (orange, remember y axis points down) - normal pointing up (-Y)
-            {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}},
-            {{ .5f, -.5f,  .5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}},
-            {{-.5f, -.5f,  .5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}},
-            {{ .5f, -.5f, -.5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}},
+            {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}, {0.f, 0.f}},
+            {{ .5f, -.5f,  .5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}, {1.f, 1.f}},
+            {{-.5f, -.5f,  .5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}, {0.f, 1.f}},
+            {{ .5f, -.5f, -.5f}, {.9f, .6f, .1f}, {0.f, -1.f, 0.f}, {1.f, 0.f}},
 
             // bottom face (red) - normal pointing down (+Y)
-            {{-.5f,  .5f, -.5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}},
-            {{ .5f,  .5f,  .5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}},
-            {{-.5f,  .5f,  .5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}},
-            {{ .5f,  .5f, -.5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}},
+            {{-.5f,  .5f, -.5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}, {0.f, 0.f}},
+            {{ .5f,  .5f,  .5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}, {1.f, 1.f}},
+            {{-.5f,  .5f,  .5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}, {0.f, 1.f}},
+            {{ .5f,  .5f, -.5f}, {.8f, .1f, .1f}, {0.f, 1.f, 0.f}, {1.f, 0.f}},
 
             // nose face (blue) - normal pointing forward (+Z)
-            {{-.5f, -.5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}},
-            {{ .5f,  .5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}},
-            {{-.5f,  .5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}},
-            {{ .5f, -.5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}},
+            {{-.5f, -.5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}, {0.f, 0.f}},
+            {{ .5f,  .5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}, {1.f, 1.f}},
+            {{-.5f,  .5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}, {0.f, 1.f}},
+            {{ .5f, -.5f,  0.5f}, {.1f, .1f, .8f}, {0.f, 0.f, 1.f}, {1.f, 0.f}},
 
             // tail face (green) - normal pointing backward (-Z)
-            {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}},
-            {{ .5f,  .5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}},
-            {{-.5f,  .5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}},
-            {{ .5f, -.5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}},
+            {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}, {0.f, 0.f}},
+            {{ .5f,  .5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}, {1.f, 1.f}},
+            {{-.5f,  .5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}, {0.f, 1.f}},
+            {{ .5f, -.5f, -0.5f}, {.1f, .8f, .1f}, {0.f, 0.f, -1.f}, {1.f, 0.f}},
 
         };
         for (auto& v : modelBuilder.vertices) {
@@ -712,7 +837,20 @@ namespace lot {
             (rand() % 100) / 100.0f
         };
 
-        gameObjects.emplace(newCube.getId(), std::move(newCube));
+        auto id = newCube.getId();
+        gameObjects.emplace(id, std::move(newCube));
+        assignDefaultDescriptorSets(gameObjects.at(id));
+    }
+
+    void FirstApp::assignDefaultDescriptorSets(LotGameObject& obj) {
+        size_t frameCount = lotRenderer.getFrameCount();
+        auto defaultImageInfo = materialManager->getDefaultTexture()->descriptorInfo();
+        obj.textureDescriptorSets.resize(frameCount);
+        for (size_t i = 0; i < frameCount; i++) {
+            LotDescriptorWriter(*textureSetLayout, *globalPool)
+                .writeImage(0, &defaultImageInfo)
+                .build(obj.textureDescriptorSets[i]);
+        }
     }
 
     void FirstApp::removeSelectedObjects() {

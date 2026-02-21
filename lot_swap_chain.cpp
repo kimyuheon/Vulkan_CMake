@@ -66,8 +66,8 @@ namespace lot {
 
     VkFormat LotSwapChain::findDepthFormat() {
         return device.findSupportedFormat(
-            {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
-            VK_IMAGE_TILING_OPTIMAL, 
+            {VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D32_SFLOAT},
+            VK_IMAGE_TILING_OPTIMAL,
             VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
     }
 
@@ -229,6 +229,17 @@ namespace lot {
     void LotSwapChain::createDepthResource() {
         VkFormat depthFormat = findDepthFormat();
         swapChainDepthFormat = depthFormat;
+
+        // 스텐실 포맷 디버그 출력
+        if (depthFormat == VK_FORMAT_D32_SFLOAT_S8_UINT) {
+            std::cout << "[SwapChain] Depth format: D32_SFLOAT_S8_UINT (stencil available)" << std::endl;
+        } else if (depthFormat == VK_FORMAT_D24_UNORM_S8_UINT) {
+            std::cout << "[SwapChain] Depth format: D24_UNORM_S8_UINT (stencil available)" << std::endl;
+        } else if (depthFormat == VK_FORMAT_D32_SFLOAT) {
+            std::cout << "[SwapChain] Depth format: D32_SFLOAT (NO stencil!)" << std::endl;
+        } else {
+            std::cout << "[SwapChain] Depth format: unknown (" << depthFormat << ")" << std::endl;
+        }
         VkExtent2D swapChainExtent = getSwapChainExtent();
 
         depthImages.resize(imageCount());
@@ -261,6 +272,9 @@ namespace lot {
             viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
             viewInfo.format = depthFormat;
             viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+            if (depthFormat == VK_FORMAT_D32_SFLOAT_S8_UINT || depthFormat == VK_FORMAT_D24_UNORM_S8_UINT) {
+                viewInfo.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+            }
             viewInfo.subresourceRange.baseMipLevel = 0;
             viewInfo.subresourceRange.levelCount = 1;
             viewInfo.subresourceRange.baseArrayLayer = 0;
@@ -278,7 +292,7 @@ namespace lot {
         depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
         depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;

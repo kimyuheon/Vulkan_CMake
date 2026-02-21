@@ -11,7 +11,9 @@
 #include "point_light_system.h"
 #include "lot_buffer.h"
 #include "lot_descriptors.h"
+
 #include "sketch_manager.h"
+#include "material_manager.h"
 
 #include <memory>
 #include <vector>
@@ -38,6 +40,7 @@ namespace lot {
             void loadGameObjects();
             void addNewCube();
             void removeSelectedObjects();
+            void assignDefaultDescriptorSets(LotGameObject& obj);
 
             // 메인 루프 함수들
             void updateCamera(KeyboardMoveCtrl& cameraCtrl, float frameTime,
@@ -76,6 +79,13 @@ namespace lot {
             // SketchManager
             SketchManager sketchmanager{ lotDevice };
             std::shared_ptr<LotModel> sharedCubeModel;
+
+            // Material
+            std::unique_ptr<MaterialManager> materialManager;
+            int currentMaterialIndex = 0;
+
+            std::unique_ptr<LotDescriptorPool> texturePool{};
+            std::unique_ptr<LotDescriptorSetLayout> textureSetLayout{};
     };
 
 } // namespace lot

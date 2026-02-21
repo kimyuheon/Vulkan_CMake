@@ -63,6 +63,14 @@ namespace lot {
             // 로컬 공간에서의 바운딩박스 (Transform 적용 전)
             const BoundingBox& getLocalBoundingBox() const { return localBoundingBox; }
 
+            // 평면 오브젝트 여부 (바운딩박스 기반 자동 감지)
+            bool isFlat() const {
+                glm::vec3 extent = localBoundingBox.max - localBoundingBox.min;
+                float minDim = glm::min(extent.x, glm::min(extent.y, extent.z));
+                float maxDim = glm::max(extent.x, glm::max(extent.y, extent.z));
+                return maxDim > 0.001f && (minDim / maxDim) < 0.05f;
+            }
+
         private:
             void createVertexBuffers(const std::vector<Vertex> &vertices);
             void createIndexBuffers(const std::vector<uint32_t> &indices);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lot_model.h"
+#include "lot_texture.h"
 
 // libs
 #include <glm/gtc/matrix_transform.hpp>
@@ -10,6 +11,7 @@
 #include <unordered_map>
 
 namespace lot {
+    class LotTexture;
     struct Transformcomponent {
         glm::vec3 translation{};
         glm::vec3 scale{1.f, 1.f, 1.f};
@@ -78,6 +80,11 @@ namespace lot {
             glm::vec3 color{};
             Transformcomponent transform{};
             bool isSelected{false};
+
+            LotTexture* texture = nullptr;
+            std::string textureName = "";
+            float textureScale = 1.0f;
+            std::vector<VkDescriptorSet> textureDescriptorSets;
 
         private:
             LotGameObject(id_t objId) : id{objId} {}

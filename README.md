@@ -1,4 +1,4 @@
-# Vulkan - CAD - CUBE
+# Vulkan - CAD - Material Mapping(재질 맵핑)
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -9,14 +9,28 @@ Tool : Visual Studio Code
 ├── Project/                        # 메인 프로젝트 폴더
 │   ├── build/                      # 빌드 시 자동 생성
 │   │   └── Debug/
+│   │       ├── models/            # 빌드 시 복사
+│   │       │   ├── cube.obj
+│   │       │   ├── quad.obj
+│   │       │   └── ...
 │   │       ├── shaders/            # 빌드 시 복사
 │   │       │   ├── simple_shader.frag
 │   │       │   ├── simple_shader.vert
 │   │       │   └── ...
+│   │       ├── textures/           # 빌드 시 복사
+│   │       │   ├── Tiles_Stone_005_basecolor
+│   │       │   └── ...
 │   │       └── VulkanApp           # 실행파일
-│   ├── shaders/                    # 원본 셰이더 파일들
+│   ├── models/                    # 원본 셰이더 파일들
+│   │   ├── cube.obj
+│   │   ├── quad.obj
+│   │   └── ...
+│   ├── shaders/                    # obj 파일들
 │   │   ├── simple_shader.frag
 │   │   ├── simple_shader.vert
+│   │   └── ...
+│   ├── textures/                   # 텍스터(재질) 파일들
+│   │   ├── Tiles_Stone_005_basecolor
 │   │   └── ...
 │   ├── CMakeLists.txt
 │   ├── README.md
@@ -37,18 +51,24 @@ Tool : Visual Studio Code
 │   ├── Win/                        # Windows용 SDK
 │   │   └── glfw/
 │   │   └── Include/
-│   │       └── tinyobjloader/
-│   │           └── tiny_obj_loader.h
+│   │       ├── tinyobjloader/
+│   │       │   └── tiny_obj_loader.h
+│   │       └── stb/
+│   │           └── stb_image.h
 │   ├── Linux/                      # Linux용 SDK
 │   │   └── glfw/
 │   │   └── include/
-│   │       └── tinyobjloader/
-│   │           └── tiny_obj_loader.h
+│   │       ├── tinyobjloader/
+│   │       │   └── tiny_obj_loader.h
+│   │       └── stb/
+│   │           └── stb_image.h
 │   └── Apple/                      # macOS용 SDK
 │       └── glfw/
 │       └── include/
-│           └── tinyobjloader/
-│               └── tiny_obj_loader.h
+│           ├── tinyobjloader/
+│           │   └── tiny_obj_loader.h
+│           └── stb/
+│               └── stb_image.h
 └── ...
 </pre>
 
@@ -66,12 +86,14 @@ Tool : Visual Studio Code
 
 > **Note**: VulkanSdk는 프로젝트 폴더와 같은 레벨에 위치하며, CMakeLists.txt에서 `../VulkanSdk/Win(Linux/Apple)/` 경로로 OS별 참조됩니다.
 
-> **추가**: tiny_obj_loader.h 를 위의 디렉토리를 보고 OS에 따라 복사해주세요.
+> **추가**: tiny_obj_loader.h와 stb_image.h를 위의 디렉토리를 보고 OS에 따라 복사해주세요.
 
 - 수정사항  
   - 선택 오류 수정 : 모델의 실제 버텍스로부터 바운딩박스 계산
   - 제목 표시줄 (Orthographic/Perspective) 표시
   - 뷰별로 큐브 그리기
+  - 선택 하이라이트를 외곽선만 적용시키기(선택 시에도 재질이 보이게 조치)
+  - 선택한 객체에 재질 맵핑
 
 - 실행결과
   - 좌표계를 오일러에서 쿼터시안으로 변경
@@ -86,6 +108,8 @@ Tool : Visual Studio Code
   - C : CAD / FPS 모드
   - 1/2/3/4 : 평면도 / 정면도 / 우측면도 / ISO
   - B : 큐브 그리기
+  - M : 선택된 객체에 재질 맵핑 추가
+  - U : 선택된 객체에 재질 맵핑 취소
 
   ---  
   - 윈도우  

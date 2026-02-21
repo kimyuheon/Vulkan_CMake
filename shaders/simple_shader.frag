@@ -3,6 +3,7 @@
 layout (location = 0) in vec3 fragColor;
 layout (location = 1) in vec3 fragPosWorld;
 layout (location = 2) in vec3 fragNormalWorld;
+layout (location = 3) in vec2 fragTexCoord;
 
 layout (location = 0) out vec4 outColor;
 
@@ -11,6 +12,8 @@ layout(push_constant) uniform Push {
     mat4 normalMatrix;
     vec3 color;
     int isSelected;
+    int hasTexture;
+    float textureScale;
 } push;
 
 struct PointLight {
@@ -30,10 +33,19 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     int lightingEnable;
 } ubo;
 
+layout (set = 1, binding = 0) uniform sampler2D texSampler;
 
 void main(){
+    // 아웃라인 패스: 단색 출력 후 종료 (2=3D 오브젝트, 3=평면 오브젝트)
+    if (push.isSelected == 2 || push.isSelected == 3) {
+        outColor = vec4(1.0, 0.8, 0.0, 1.0);  // 주황빛 노란색
+        return;
+    }
+
     vec3 baseColor;
-    if (length(push.color) > 0.01) {
+    if (push.hasTexture == 1) {
+        baseColor = texture(texSampler, fragTexCoord * push.textureScale).rgb;
+    } else if (length(push.color) > 0.01) {
         baseColor = push.color;  // GameObject의 color 사용
     } else {
         baseColor = fragColor;   // 버텍스 색상 사용
@@ -77,26 +89,6 @@ void main(){
     } else {
         // 조명이 꺼져 있을 때: 균일한 밝기 (플랫 셰이딩)
         finalColor = baseColor * 0.8;
-    }
-    // 선택된 객체라면 하이라이트 효과 적용
-    if (push.isSelected == 1) {
-        // 노멀 벡터를 이용한 가장자리 감지 (더 강하게)
-        vec3 normalWorld = normalize(fragNormalWorld);
-        float edge = 1.0 - abs(normalWorld.z);
-        edge = pow(edge, 1.0);  // 지수를 낮춰서 더 넓은 영역에 적용
-        
-        // 밝은 노란색/주황색 테두리
-        vec3 edgeColor = vec3(1.0, 0.8, 0.0);  // 주황빛 노란색
-        
-        // 가장자리는 매우 강하게 표시
-        if (edge > 0.2) {
-            finalColor = mix(finalColor, edgeColor, 0.8);  // 80% 혼합
-            finalColor *= 2.0;  // 2배 밝게
-        } else {
-            // 중앙부도 약간 밝게
-            finalColor = mix(finalColor, vec3(1.0, 1.0, 0.0), 0.2);
-            finalColor *= 1.3;
-        }
     }
 
     outColor = vec4(finalColor, 1.0);

@@ -350,13 +350,21 @@ add_custom_command(TARGET VulkanApp POST_BUILD
     # 1단계: models 폴더 강제 생성
     COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:VulkanApp>/models"
     # 2단계: 모든 obj 파일 복사
-    COMMAND ${CMAKE_COMMAND} -E copy_directory 
-        "${CMAKE_CURRENT_SOURCE_DIR}/models" 
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/models"
         "$<TARGET_FILE_DIR:VulkanApp>/models"
-    
-    # 3단계: 확인 메시지
+
+    # textures 폴더 강제 생성
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:VulkanApp>/textures"
+    # textures 폴더 통째로 복사
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/textures"
+        "$<TARGET_FILE_DIR:VulkanApp>/textures"
+
+    # 확인 메시지
     COMMAND ${CMAKE_COMMAND} -E echo "Shaders copied to: $<TARGET_FILE_DIR:VulkanApp>/shaders"
     COMMAND ${CMAKE_COMMAND} -E echo "Models copied to: $<TARGET_FILE_DIR:VulkanApp>/models"
+    COMMAND ${CMAKE_COMMAND} -E echo "Textures copied to: $<TARGET_FILE_DIR:VulkanApp>/textures"
     
     COMMENT "Creating shaders directory and copying all shader files"
     VERBATIM
