@@ -14,6 +14,7 @@
 
 #include "sketch_manager.h"
 #include "material_manager.h"
+#include "transform_tool.h"
 
 #include <memory>
 #include <vector>
@@ -83,6 +84,9 @@ namespace lot {
             // Material
             std::unique_ptr<MaterialManager> materialManager;
             int currentMaterialIndex = 0;
+
+            // Transform Tool
+            TransformTool transformTool{};
 
             std::unique_ptr<LotDescriptorPool> texturePool{};
             std::unique_ptr<LotDescriptorSetLayout> textureSetLayout{};

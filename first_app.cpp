@@ -256,7 +256,14 @@ namespace lot {
         auto* window = lotWindow.getGLFWwindow();
 
         // 객체 선택 처리 (메인 카메라 사용)
-        if (!sketchmanager.isSketchActive()) {
+        if (transformTool.isActive()) {
+            // TransformTool 활성 중 - 좌클릭은 기준점/목적지 확정에 사용
+            double mx, my;
+            glfwGetCursorPos(window, &mx, &my);
+            int w, h;
+            glfwGetWindowSize(window, &w, &h);
+            transformTool.handleMouseClick(window, mx, my, w, h, camera, gameObjects);
+        } else if (!sketchmanager.isSketchActive()) {
             selectionManager.handleMouseClick(window, camera, gameObjects);
         } else {
             // 스케치 모드 중 마우스 상태 동기화 (스케치 완료 시 클릭이 선택으로 처리되지 않도록)
@@ -378,9 +385,51 @@ namespace lot {
             }
         }
 
-        // ESC: 모든 선택 해제
+        // ESC: TransformTool 취소 우선, 그 다음 선택 해제
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-            selectionManager.clearAllSelections(gameObjects);
+            if (transformTool.isActive()) {
+                transformTool.cancel(gameObjects);
+            } else {
+                selectionManager.clearAllSelections(gameObjects);
+            }
+        }
+
+        // T/R/S: TransformTool 키 입력
+        if (!sketchmanager.isSketchActive()) {
+            transformTool.handleKeyInput(window, camera, gameObjects);
+
+            // 미리보기 업데이트 (PREVIEWING 상태일 때 매 프레임)
+            if (transformTool.isActive()) {
+                double mx, my;
+                glfwGetCursorPos(window, &mx, &my);
+                int w, h;
+                glfwGetWindowSize(window, &w, &h);
+                transformTool.updatePreview(mx, my, w, h, camera, gameObjects);
+            }
+
+            // 타이틀: 기존 [CAD/View][Perspective/Orthographic] 뒤에 TransformTool 상태 추가
+            {
+                std::string baseTitle = WinTitleStr;
+                baseTitle += camera.getCadMode() ? " [CAD]" : " [View]";
+                baseTitle += (projectionType == KeyboardMoveCtrl::ProjectionType::Perspective)
+                             ? "[Perspective]" : "[Orthographic]";
+                if (transformTool.isActive()) {
+                    auto modeStr = [&]() -> std::string {
+                        switch (transformTool.getMode()) {
+                            case lot::TransformTool::Mode::MOVE:   return "MOVE";
+                            case lot::TransformTool::Mode::ROTATE: return "ROTATE";
+                            case lot::TransformTool::Mode::SCALE:  return "SCALE";
+                            default: return "";
+                        }
+                    }();
+                    std::string title = baseTitle + " | " + modeStr;
+                    const std::string& numBuf = transformTool.getNumberBuffer();
+                    if (!numBuf.empty()) title += " > " + numBuf + "_";
+                    glfwSetWindowTitle(window, title.c_str());
+                } else {
+                    glfwSetWindowTitle(window, baseTitle.c_str());
+                }
+            }
         }
 
         // G: 조명 토글
@@ -526,7 +575,7 @@ namespace lot {
                     isOrbitingActive = true;
                 } else {
                     float rotationSpeed = 0.01f;
-                    camera.orbitAroundTarget(deltaX * rotationSpeed, -deltaY * rotationSpeed);
+                    camera.orbitAroundTarget(-deltaX * rotationSpeed, -deltaY * rotationSpeed);
                 }
             } else {
                 isOrbitingActive = false;
@@ -569,7 +618,7 @@ namespace lot {
                 float ndcX = static_cast<float>((2.0f * currentMouseX) / width - 1.0f);
                 float ndcY = static_cast<float>((2.0f * currentMouseY) / height - 1.0f);
 
-                glm::vec4 clipNear = glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
+                glm::vec4 clipNear = glm::vec4(ndcX, ndcY, 0.0f, 1.0f);
                 glm::vec4 viewNear = invProj * clipNear;
                 viewNear /= viewNear.w;
                 glm::vec3 worldNear = glm::vec3(invView * viewNear);
@@ -777,21 +826,23 @@ namespace lot {
         obj.model = objModel;
         obj.transform.translation = { .0f, .5f, -.5f };
         obj.transform.scale = glm::vec3(3.f);
+        //obj.transform.rotation = glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         obj.color = {0.3f, 0.5f, 0.8f};
         gameObjects.emplace(obj.getId(), std::move(obj));
 
         objModel = LotModel::createModelFromFile(lotDevice, "models/flat_vase.obj");
         auto flat_vase = LotGameObject::createGameObject();
         flat_vase.model = objModel;
-        flat_vase.transform.translation = { .0f, .0f, 1.f };
+        flat_vase.transform.translation = { .0f, .5f, 1.f };
         flat_vase.transform.scale = glm::vec3{ 2.5f, 1.5f, 2.5f };
+        //flat_vase.transform.rotation = glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         flat_vase.color = {0.3f, 0.5f, 0.8f};
         gameObjects.emplace(flat_vase.getId(), std::move(flat_vase));
 
         objModel = LotModel::createModelFromFile(lotDevice, "models/quad.obj");
         auto quad_vase = LotGameObject::createGameObject();
         quad_vase.model = objModel;
-        quad_vase.transform.translation = { 0.f, .5f, 2.5f };
+        quad_vase.transform.translation = { 0.f, 0.5f, 0.f };
         quad_vase.transform.scale = glm::vec3{ 4.f, 1.f, 4.f };
         gameObjects.emplace(quad_vase.getId(), std::move(quad_vase));
 

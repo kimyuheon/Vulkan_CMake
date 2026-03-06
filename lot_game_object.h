@@ -46,7 +46,7 @@ namespace lot {
 
         // 현재 회전 상태에서의 방향 벡터들
         glm::vec3 right() const   { return glm::mat3_cast(rotation) * glm::vec3(1,0,0); }
-        glm::vec3 up() const      { return glm::mat3_cast(rotation) * glm::vec3(0,1,0); }
+        glm::vec3 up() const      { return glm::mat3_cast(rotation) * glm::vec3(0,0,1); }
         glm::vec3 forward() const { return glm::mat3_cast(rotation) * glm::vec3(0,0,-1); }
     };
 

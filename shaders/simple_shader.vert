@@ -39,7 +39,7 @@ void main() {
     vec4 positionWorld = push.modelMatrix * vec4(position, 1.0);
 
     if (push.isSelected == 2) {
-        // 3D 오브젝트: 클립스페이스 노멀 방향으로 확장 (vase, cube 등)
+        // 3D 오브젝트: 노멀 방향 확장, 노멀이 뷰와 평행하면 방사형 확장으로 폴백
         gl_Position = ubo.projection * ubo.view * positionWorld;
         vec3 worldNormal = normalize(mat3(push.normalMatrix) * normal);
         vec3 viewNormal = mat3(ubo.view) * worldNormal;
@@ -51,6 +51,15 @@ void main() {
         if (len > 0.001) {
             screenDir /= len;
             gl_Position.xy += screenDir * 0.007 * gl_Position.w;
+        } else {
+            // 노멀이 뷰 방향과 평행 (축 정렬 큐브 등) → 중심 기준 방사형 확장
+            vec4 clipCenter = ubo.projection * ubo.view * vec4(push.modelMatrix[3].xyz, 1.0);
+            screenDir = gl_Position.xy / gl_Position.w - clipCenter.xy / clipCenter.w;
+            len = length(screenDir);
+            if (len > 0.001) {
+                screenDir /= len;
+                gl_Position.xy += screenDir * 0.007 * gl_Position.w;
+            }
         }
     } else if (push.isSelected == 3) {
         // 평면 오브젝트: 오브젝트 중심에서 방사형 확장 (floor 등)

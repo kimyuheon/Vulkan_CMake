@@ -113,7 +113,7 @@ namespace lot {
         glm::vec3 rotatedDirection = additionalRotation * baseDirection;
 
         // 3. Up 벡터도 회전 적용
-        glm::vec3 baseUp = glm::vec3(0.0f, -1.0f, 0.0f);  // Vulkan 스타일
+        glm::vec3 baseUp = glm::vec3(0.0f, 0.0f, 1.0f);  // Vulkan CAD 스타일
         glm::vec3 rotatedUp = additionalRotation * baseUp;
 
         // 4. 회전된 방향으로 뷰 설정
@@ -126,7 +126,7 @@ namespace lot {
         glm::mat3 rotMatrix = glm::mat3(rotMatrix4);
 
         glm::vec3 right = rotMatrix * glm::vec3(1, 0, 0);
-        glm::vec3 up = rotMatrix * glm::vec3(0, 1, 0);
+        glm::vec3 up = rotMatrix * glm::vec3(0, 0, 1);
 
         glm::quat pitchQuat = glm::angleAxis(deltaY, right);
         glm::quat yawQuat = glm::angleAxis(deltaX, up);
@@ -145,7 +145,7 @@ namespace lot {
             if (mouseWorldPos) {
                 // 마우스 위치를 타겟 평면에 투영
                 glm::mat3 rotMatrix = glm::mat3(glm::mat4_cast(orbitRotation));
-                glm::vec3 forward = rotMatrix * glm::vec3(0.0f, 0.0f, 1.0f);
+                glm::vec3 forward = rotMatrix * glm::vec3(0.0f, 1.0f, 0.0f);
 
                 // 마우스 레이와 타겟 평면의 교차점 계산
                 float t = glm::dot(targetPosition - *mouseWorldPos, forward) / glm::dot(forward, forward);
@@ -158,11 +158,12 @@ namespace lot {
         } else {
             float oldDistance = orbitDistance;
             orbitDistance -= delta;
-            orbitDistance = glm::max(orbitDistance, 0.5f);
+            //orbitDistance = glm::max(orbitDistance, 0.5f);
+            orbitDistance = glm::clamp(orbitDistance, 0.5f, 200.0f);
             if (mouseWorldPos) {
                 // 마우스 위치를 타겟 평면에 투영
                 glm::mat3 rotMatrix = glm::mat3(glm::mat4_cast(orbitRotation));
-                glm::vec3 forward = rotMatrix * glm::vec3(0.0f, 0.0f, 1.0f);
+                glm::vec3 forward = rotMatrix * glm::vec3(0.0f, 1.0f, 0.0f);
 
                 // 마우스 레이와 타겟 평면의 교차점 계산
                 float t = glm::dot(targetPosition - *mouseWorldPos, forward) / glm::dot(forward, forward);
@@ -180,7 +181,7 @@ namespace lot {
         glm::mat3 roMatrix = glm::mat3(glm::mat4_cast(orbitRotation));
 
         glm::vec3 right = roMatrix * glm::vec3(1.0f, 0.0f, 0.0f); // 로컬 X
-        glm::vec3 up = roMatrix * glm::vec3(0.0f, -1.0f, 0.0f);   // 로컬 Y
+        glm::vec3 up = roMatrix * glm::vec3(0.0f, 0.0f, 1.0f);   // 로컬 Y
 
         if (isOrtho) {
             targetPosition += right * deltaX * orthographicSize * aspect + 
@@ -203,8 +204,8 @@ namespace lot {
         glm::mat3 rotMatrix = glm::mat3(rotMatrix4);
 
         // 기본 방향 벡터(카메라 -Z 방향)
-        glm::vec3 defaultForward = glm::vec3(0.0f, 0.0f, 1.0f);
-        glm::vec3 defaultUp = glm::vec3(0.0f, -1.0f, 0.0f);
+        glm::vec3 defaultForward = glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 defaultUp = glm::vec3(0.0f, 0.0f, 1.0f);
 
         // 회전 적용된 방향 벡터
         glm::vec3 forward = rotMatrix * defaultForward;
@@ -227,7 +228,7 @@ namespace lot {
         {
         case CadViewType::Top:
             // Top View (평면도) - X축 기준 -90도 회전하여 위에서 아래를 내려다봄
-            orbitRotation = glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            orbitRotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
             break;
         case CadViewType::Front:
             // Front View (정면도) - 기본 방향
@@ -235,14 +236,14 @@ namespace lot {
             break;
         case CadViewType::Right:
             // Right View (우측면도) - Y -90도
-            orbitRotation = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            orbitRotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
             break;
         case CadViewType::Isometric:
         {
             // 입체뷰
             glm::quat rotX = glm::angleAxis(glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            glm::quat rotY = glm::angleAxis(glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-            orbitRotation = rotY * rotX;
+            glm::quat rotZ = glm::angleAxis(glm::radians(-45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+            orbitRotation = rotZ * rotX;
             break;
         }
         default:

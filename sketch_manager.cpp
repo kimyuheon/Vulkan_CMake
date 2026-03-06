@@ -329,7 +329,7 @@ namespace lot {
         glm::vec3 worldCenter = localToWorld(center, depthCenter);
 
         // 회전: 로컬 Y축이 법선(높이) 방향을 향하도록
-        glm::mat3 rotationMat = glm::mat3(sketchPlaneRight, sketchPlaneNormal, sketchPlaneUp);
+        glm::mat3 rotationMat = glm::mat3(sketchPlaneRight, sketchPlaneUp, sketchPlaneNormal);
         glm::quat rotation = glm::quat_cast(glm::mat4(rotationMat));
 
         // 박스 프리뷰 (X: right, Y: 높이, Z: up)
@@ -338,8 +338,8 @@ namespace lot {
         previewBox.transform.rotation = rotation;
         previewBox.transform.scale = glm::vec3(
             std::abs(size.x),
-            std::abs(height),
-            std::abs(size.y)
+            std::abs(size.y),
+            std::abs(height)
         );
         previewBox.color = glm::vec3(0.2f, 0.8f, 1.0f);
         previewBox.model = cubeModel;
@@ -375,7 +375,7 @@ namespace lot {
         glm::vec3 worldCenter = localToWorld(center, depthCenter);
 
         // 회전: 로컬 Y축이 법선(높이) 방향을 향하도록
-        glm::mat3 rotationMat = glm::mat3(sketchPlaneRight, sketchPlaneNormal, sketchPlaneUp);
+        glm::mat3 rotationMat = glm::mat3(sketchPlaneRight, sketchPlaneUp, sketchPlaneNormal);
         glm::quat rotation = glm::quat_cast(glm::mat4(rotationMat));
 
         auto finalBox = LotGameObject::createGameObject();
@@ -383,8 +383,8 @@ namespace lot {
         finalBox.transform.rotation = rotation;
         finalBox.transform.scale = glm::vec3(
             std::abs(size.x),
-            std::abs(height),
-            std::abs(size.y)
+            std::abs(size.y),
+            std::abs(height)
         );
 
         // 랜덤 색상
@@ -426,9 +426,9 @@ namespace lot {
         if (dotX > dotY && dotX > dotZ)
             return SketchPlane::YZ;
         else if (dotY > dotX && dotY > dotZ)
-            return SketchPlane::XZ;
-        else
             return SketchPlane::XY;
+        else
+            return SketchPlane::XZ;
     }
 
     void SketchManager::getPlaneVectors(SketchPlane plane, glm::vec3& right, glm::vec3& up, glm::vec3& normal) {
@@ -437,20 +437,20 @@ namespace lot {
             case SketchPlane::XY:
                 // Front view: (1,0,0) × (0,0,-1) = (0,1,0) ✓
                 right = glm::vec3(1.0f, 0.0f, 0.0f);
-                up = glm::vec3(0.0f, 1.0f, 0.0f);
-                normal = glm::vec3(0.0f, 0.0f, -1.0f);
+                up = glm::vec3(0.0f, 0.0f, 1.0f);
+                normal = glm::vec3(0.0f, 1.0f, 0.0f);
                 break;
             case SketchPlane::YZ:
                 // Right view: (0,0,1) × (1,0,0) = (0,1,0) ✓
-                right = glm::vec3(0.0f, 0.0f, 1.0f);
-                up = glm::vec3(0.0f, 1.0f, 0.0f);
+                right = glm::vec3(0.0f, 1.0f, 0.0f);
+                up = glm::vec3(0.0f, 0.0f, 1.0f);
                 normal = glm::vec3(1.0f, 0.0f, 0.0f);
                 break;
             case SketchPlane::XZ:
                 // Top view: (1,0,0) × (0,1,0) = (0,0,1) ✓
                 right = glm::vec3(1.0f, 0.0f, 0.0f);
-                up = glm::vec3(0.0f, 0.0f, 1.0f);
-                normal = glm::vec3(0.0f, 1.0f, 0.0f);
+                up = glm::vec3(0.0f, 1.0f, 0.0f);
+                normal = glm::vec3(0.0f, 0.0f, 1.0f);
                 break;
         }
     }
