@@ -255,6 +255,7 @@ namespace lot {
                               || glfwGetKey(window, GLFW_KEY_KP_DECIMAL) == GLFW_PRESS;
             if (periodPressed && !periodKeyWasPressed
                 && numberBuffer.find('.') == std::string::npos) {
+                // 비워져있거나 '-'일 시 앞에 '0' 먼저 붙이기('.'전에)
                 if (numberBuffer.empty() || numberBuffer == "-") numberBuffer += '0';
                 numberBuffer += '.';
                 std::cout << "[TransformTool] 입력: " << numberBuffer << "\n";

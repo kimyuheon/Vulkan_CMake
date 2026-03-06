@@ -1,4 +1,4 @@
-# Vulkan - CAD - Material Mapping(재질 맵핑)
+# Vulkan - CAD - 이동/회전/축척
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -94,6 +94,7 @@ Tool : Visual Studio Code
   - 뷰별로 큐브 그리기
   - 선택 하이라이트를 외곽선만 적용시키기(선택 시에도 재질이 보이게 조치)
   - 선택한 객체에 재질 맵핑
+  - 선택한 객체에 이동 / 회전 / 축척 기능 추가
 
 - 실행결과
   - 좌표계를 오일러에서 쿼터시안으로 변경
@@ -110,6 +111,7 @@ Tool : Visual Studio Code
   - B : 큐브 그리기
   - M : 선택된 객체에 재질 맵핑 추가
   - U : 선택된 객체에 재질 맵핑 취소
+  - T/R/S : 이동 / 회전 / 축척
 
   ---  
   - 윈도우  
