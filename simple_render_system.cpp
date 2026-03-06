@@ -32,6 +32,7 @@ namespace lot {
         createPipelineLayout(globalSetLayout, textureSetLayout);
         createPipeline(renderPass);
         createHighlightPipeline(renderPass);
+        createOutlinePipeline(renderPass);
     }
 
     SimpleRenderSystem::~SimpleRenderSystem() {
@@ -184,42 +185,96 @@ namespace lot {
             pipelineConfig);
     }
 
+    void SimpleRenderSystem::createOutlinePipeline(VkRenderPass renderPass) {
+        assert(pipelineLayout != nullptr && "Cannot create outline pipeline before pipeline layout");
+
+        PipelineConfigInfo pipelineConfig{};
+        LotPipeline::defaultPipelineConfigInfo(pipelineConfig);
+        pipelineConfig.renderPass = renderPass;
+        pipelineConfig.pipelineLayout = pipelineLayout;
+
+        // 컬링 없음: 모든 면 렌더링 (스크린 공간 법선 + 중심 폴백으로 아웃라인 처리)
+        pipelineConfig.rasterizationInfo.cullMode = VK_CULL_MODE_NONE;
+
+        pipelineConfig.depthStencilInfo.depthTestEnable = VK_TRUE;
+        pipelineConfig.depthStencilInfo.depthWriteEnable = VK_FALSE;
+        pipelineConfig.depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+
+        // 스텐실: 오브젝트가 그려진 영역(stencil=1)은 제외, 외곽만 그리기
+        VkStencilOpState stencilTest{};
+        stencilTest.failOp = VK_STENCIL_OP_KEEP;
+        stencilTest.passOp = VK_STENCIL_OP_KEEP;
+        stencilTest.depthFailOp = VK_STENCIL_OP_KEEP;
+        stencilTest.compareOp = VK_COMPARE_OP_NOT_EQUAL;
+        stencilTest.compareMask = 0xFF;
+        stencilTest.writeMask = 0x00;
+        stencilTest.reference = 1;
+        pipelineConfig.depthStencilInfo.stencilTestEnable = VK_TRUE;
+        pipelineConfig.depthStencilInfo.front = stencilTest;
+        pipelineConfig.depthStencilInfo.back = stencilTest;
+
+        outlinePipeline = std::make_unique<LotPipeline>(
+            lotDevice,
+            "shaders/simple_shader.vert.spv",
+            "shaders/simple_shader.frag.spv",
+            pipelineConfig);
+    }
+
     void SimpleRenderSystem::renderHighlights(FrameInfo &frameInfo) {
-        highlightPipeline->bind(frameInfo.commandBuffer);
-
+        // ── 1. 3D 오브젝트 아웃라인 (프론트페이스 컬링 → 백페이스 실루엣) ──
+        outlinePipeline->bind(frameInfo.commandBuffer);
         vkCmdBindDescriptorSets(
-            frameInfo.commandBuffer,
-            VK_PIPELINE_BIND_POINT_GRAPHICS,
-            pipelineLayout,
-            0, 
-            1, 
-            &frameInfo.globalDescriptorSet, 
-            0, 
-            nullptr
-        );
+            frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            pipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
 
-        int highlightCount = 0;
         for (auto& kv : frameInfo.Objects) {
             auto& obj = kv.second;
-            if (!obj.isSelected) continue;
-            highlightCount++;
+            if (!obj.isSelected || !obj.model || obj.model->isFlat()) continue;
 
             if (!obj.textureDescriptorSets.empty()) {
                 vkCmdBindDescriptorSets(
-                    frameInfo.commandBuffer,
-                    VK_PIPELINE_BIND_POINT_GRAPHICS,
-                    pipelineLayout,
-                    1, 1, &obj.textureDescriptorSets[frameInfo.frameIndex],
+                    frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    pipelineLayout, 1, 1, &obj.textureDescriptorSets[frameInfo.frameIndex],
                     0, nullptr);
             }
 
             SimplePushConstantData push{};
-            //push.color = glm::vec3(1.0f, 0.5f, 0.0f);  // 주황색 하이라이트
-            //push.transform = projectionView * obj.transform.mat4();
-            push.modelMatrix = obj.transform.mat4();
+            push.modelMatrix  = obj.transform.mat4();
             push.normalMatrix = obj.transform.normalMatrix();
-            // 평면 오브젝트는 방사형 확장(3), 3D 오브젝트는 노멀 확장(2)
-            push.isSelected = (obj.model && obj.model->isFlat()) ? 3 : 2;
+            push.isSelected   = 2;  // 백페이스 아웃라인
+
+            vkCmdPushConstants(
+                frameInfo.commandBuffer, pipelineLayout,
+                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                0, sizeof(SimplePushConstantData), &push);
+
+            obj.model->bind(frameInfo.commandBuffer);
+            obj.model->draw(frameInfo.commandBuffer);
+        }
+
+        // ── 2. 평면 오브젝트 아웃라인 (컬링 없음 → 방사형 확장) ──
+        highlightPipeline->bind(frameInfo.commandBuffer);
+        vkCmdBindDescriptorSets(
+            frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            pipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
+
+        int highlightCount = 0;
+        for (auto& kv : frameInfo.Objects) {
+            auto& obj = kv.second;
+            if (!obj.isSelected || !obj.model || !obj.model->isFlat()) continue;
+            highlightCount++;
+
+            if (!obj.textureDescriptorSets.empty()) {
+                vkCmdBindDescriptorSets(
+                    frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    pipelineLayout, 1, 1, &obj.textureDescriptorSets[frameInfo.frameIndex],
+                    0, nullptr);
+            }
+
+            SimplePushConstantData push{};
+            push.modelMatrix  = obj.transform.mat4();
+            push.normalMatrix = obj.transform.normalMatrix();
+            push.isSelected   = 3;  // 방사형 확장
 
             vkCmdPushConstants(
                 frameInfo.commandBuffer, pipelineLayout,

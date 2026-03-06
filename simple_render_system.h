@@ -28,11 +28,13 @@ namespace lot {
                                       VkDescriptorSetLayout textureSetLayout);
             void createPipeline(VkRenderPass renderPass);
             void createHighlightPipeline(VkRenderPass renderPass);
+            void createOutlinePipeline(VkRenderPass renderPass);
 
             LotDevice& lotDevice;
 
             std::unique_ptr<LotPipeline> lotPipeline;
-            std::unique_ptr<LotPipeline> highlightPipeline;
+            std::unique_ptr<LotPipeline> highlightPipeline;  // 평면 오브젝트용 (cullMode=NONE)
+            std::unique_ptr<LotPipeline> outlinePipeline;    // 3D 오브젝트용 (cullMode=FRONT)
             VkPipelineLayout pipelineLayout;
     };
 }

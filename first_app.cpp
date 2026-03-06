@@ -357,18 +357,20 @@ namespace lot {
             LotCamera::CadViewType viewType;
             bool hasInput = false;
             
-            if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-                viewType = LotCamera::CadViewType::Front;
-                hasInput = true;
-            } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
-                viewType = LotCamera::CadViewType::Top;
-                hasInput = true;
-            } else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
-                viewType = LotCamera::CadViewType::Right;
-                hasInput = true;
-            } else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
-                viewType = LotCamera::CadViewType::Isometric;
-                hasInput = true;
+            if (!transformTool.isActive()) {
+                if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+                    viewType = LotCamera::CadViewType::Front;
+                    hasInput = true;
+                } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+                    viewType = LotCamera::CadViewType::Top;
+                    hasInput = true;
+                } else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+                    viewType = LotCamera::CadViewType::Right;
+                    hasInput = true;
+                } else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
+                    viewType = LotCamera::CadViewType::Isometric;
+                    hasInput = true;
+                }
             }
             
             if (hasInput && !viewKeyPressed) {
