@@ -11,6 +11,9 @@
 #include <vector>
 
 namespace lot {
+    enum class OutlineType : int {
+        Default, Higtlight, Outline
+    };
     class SimpleRenderSystem {
         public:
             SimpleRenderSystem(LotDevice &device, VkRenderPass renderPass, 
@@ -23,12 +26,13 @@ namespace lot {
 
             void renderGameObjects(FrameInfo &frameInfo);
             void renderHighlights(FrameInfo &frameInfo);
+            void renderOutlineLoop(FrameInfo& frameInfo, int isSelected);
         private:
             void createPipelineLayout(VkDescriptorSetLayout globalSetLayout,
                                       VkDescriptorSetLayout textureSetLayout);
-            void createPipeline(VkRenderPass renderPass);
-            void createHighlightPipeline(VkRenderPass renderPass);
-            void createOutlinePipeline(VkRenderPass renderPass);
+            void createPipeline(VkRenderPass renderPass, OutlineType type = OutlineType::Default);
+            //void createHighlightPipeline(VkRenderPass renderPass);
+            //void createOutlinePipeline(VkRenderPass renderPass);
 
             LotDevice& lotDevice;
 
