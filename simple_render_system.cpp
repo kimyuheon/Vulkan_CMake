@@ -31,8 +31,9 @@ namespace lot {
     : lotDevice{device}  {
         createPipelineLayout(globalSetLayout, textureSetLayout);
         createPipeline(renderPass);
-        createPipeline(renderPass, OutlineType::Higtlight);
-        createPipeline(renderPass, OutlineType::Outline);
+        // JFA로 대체
+        //createPipeline(renderPass, OutlineType::Higtlight);
+        //createPipeline(renderPass, OutlineType::Outline);
         //createHighlightPipeline(renderPass);
         //createOutlinePipeline(renderPass);
     }
@@ -123,7 +124,9 @@ namespace lot {
                 "shaders/simple_shader.vert.spv",
                 "shaders/simple_shader.frag.spv" ,
                 pipelineConfig);
-        } else if (type == OutlineType::Higtlight) {
+        } 
+        // JFA로 대체
+        /* else if (type == OutlineType::Higtlight) {
             highlightPipeline = std::make_unique<LotPipeline>(
                 lotDevice,
                 "shaders/simple_shader.vert.spv",
@@ -135,7 +138,7 @@ namespace lot {
                 "shaders/simple_shader.vert.spv",
                 "shaders/simple_shader.frag.spv" ,
                 pipelineConfig);
-        }
+        } */
     }
 
     void SimpleRenderSystem::renderGameObjects(FrameInfo &frameInfo) {

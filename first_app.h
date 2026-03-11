@@ -15,6 +15,7 @@
 #include "sketch_manager.h"
 #include "material_manager.h"
 #include "transform_tool.h"
+#include "jfa_render_system.h"
 
 #include <memory>
 #include <vector>
@@ -87,6 +88,9 @@ namespace lot {
 
             // Transform Tool
             TransformTool transformTool{};
+
+            // JFA outline system (initialized after renderer is ready)
+            std::unique_ptr<JFARenderSystem> jfaRenderSystem;
 
             std::unique_ptr<LotDescriptorPool> texturePool{};
             std::unique_ptr<LotDescriptorSetLayout> textureSetLayout{};

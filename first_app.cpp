@@ -92,6 +92,15 @@ namespace lot {
             globalSetLayout->getDescriptorSetLayout()
         );
 
+        // JFARenderSystem
+        jfaRenderSystem = std::make_unique<JFARenderSystem>(
+            lotDevice,
+            lotRenderer.getSwapChainRenderPass(),
+            VkExtent2D{static_cast<uint32_t>(WIDTH), static_cast<uint32_t>(HEIGHT)},
+            static_cast<int>(frameCount),
+            globalSetLayout->getDescriptorSetLayout()
+        );
+
         // MaterualManager 초기화
         materialManager = std::make_unique<MaterialManager>(lotDevice);
         materialManager->loadMaterialsFromFolder("textures");
@@ -205,10 +214,15 @@ namespace lot {
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
                 
+                // JFA selection mask + distance field (BEFORE main renderpass)
+                jfaRenderSystem->renderSelectionMask(commandBuffer, frameIndex, frameInfo);
+                jfaRenderSystem->runJFA(commandBuffer, frameIndex);
+
                 lotRenderer.beginSwapChainRenderPass(commandBuffer);
-                
+
                 simpleRenderSystem->renderGameObjects(frameInfo);
-                simpleRenderSystem->renderHighlights(frameInfo);
+                // JFA outline replaces old stencil-based renderHighlights
+                jfaRenderSystem->renderOutline(commandBuffer, frameIndex);
 
                 if (sketchmanager.isSketchActive())
                     renderSketchPreview(frameInfo);

@@ -1,0 +1,54 @@
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+// Binding 0: input (selection mask as sampler, or previous JFA buffer as sampler)
+layout(set = 0, binding = 0) uniform sampler2D inputSampler;
+
+// Binding 1: output JFA buffer (rg = nearest seed UV, ba unused)
+layout(set = 0, binding = 1, rg32f) uniform image2D outputImage;
+
+layout(push_constant) uniform Push {
+    ivec2 imageSize;
+    int   stepSize;   // 0 = init from selection mask, >0 = JFA step
+} push;
+
+void main() {
+    ivec2 coord = ivec2(gl_GlobalInvocationID.xy);
+    if (coord.x >= push.imageSize.x || coord.y >= push.imageSize.y) return;
+
+    vec2 uv = (vec2(coord) + 0.5) / vec2(push.imageSize);
+
+    if (push.stepSize == 0) {
+        // Init: seed pixels store their own UV, others store (-1,-1)
+        float mask = texture(inputSampler, uv).r;
+        if (mask > 0.5) {
+            imageStore(outputImage, coord, vec4(uv, 0.0, 0.0));
+        } else {
+            imageStore(outputImage, coord, vec4(-1.0, -1.0, 0.0, 0.0));
+        }
+    } else {
+        // JFA step: check 3x3 neighbours at offset ±stepSize
+        vec2 nearest = vec2(-1.0);
+        float minDist = 1e10;
+
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dx = -1; dx <= 1; dx++) {
+                ivec2 sampleCoord = coord + ivec2(dx, dy) * push.stepSize;
+                sampleCoord = clamp(sampleCoord, ivec2(0), push.imageSize - 1);
+
+                vec2 sampleUv = (vec2(sampleCoord) + 0.5) / vec2(push.imageSize);
+                vec2 seed = texture(inputSampler, sampleUv).rg;
+
+                if (seed.x < 0.0) continue;
+
+                float d = distance(uv, seed);
+                if (d < minDist) {
+                    minDist = d;
+                    nearest = seed;
+                }
+            }
+        }
+        imageStore(outputImage, coord, vec4(nearest, 0.0, 0.0));
+    }
+}
