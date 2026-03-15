@@ -1,4 +1,4 @@
-# Vulkan - CAD - 이동/회전/축척
+# Vulkan - imgui(GUI 추가)
 
 Tool : Visual Studio Code
 - 파일 구조
@@ -69,6 +69,7 @@ Tool : Visual Studio Code
 │           │   └── tiny_obj_loader.h
 │           └── stb/
 │               └── stb_image.h
+├── imgui/                      # imgui 라이브러리
 └── ...
 </pre>
 
@@ -85,6 +86,7 @@ Tool : Visual Studio Code
 | `lot_*.cpp/h` | Vulkan 엔진 컴포넌트들 |
 
 > **Note**: VulkanSdk는 프로젝트 폴더와 같은 레벨에 위치하며, CMakeLists.txt에서 `../VulkanSdk/Win(Linux/Apple)/` 경로로 OS별 참조됩니다.
+> **Note**: imgui는 프로젝트 폴더와 같은 레벨에 위치하며, OS와 상관없이 참조됩니다.
 
 > **추가**: tiny_obj_loader.h와 stb_image.h를 위의 디렉토리를 보고 OS에 따라 복사해주세요.(https://github.com/kimyuheon/Vulkan_CMake/tree/main/include)
 
