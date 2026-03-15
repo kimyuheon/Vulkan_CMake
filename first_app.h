@@ -17,6 +17,10 @@
 #include "transform_tool.h"
 #include "jfa_render_system.h"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
+
 #include <memory>
 #include <vector>
 #include <chrono>
@@ -60,6 +64,8 @@ namespace lot {
             void printDebugInfo(const std::chrono::high_resolution_clock::time_point& currentTime,
                                const LotGameObject& viewerObject, bool enableLighting);
             void renderSketchPreview(FrameInfo& frameInfo);
+            void initImGui();
+            void cleanupImGui();
 
             LotWindow lotWindow{ WIDTH, HEIGHT, "Hellow Lot Vulkan!!!" };
             LotDevice lotDevice{ lotWindow };
@@ -94,6 +100,8 @@ namespace lot {
 
             std::unique_ptr<LotDescriptorPool> texturePool{};
             std::unique_ptr<LotDescriptorSetLayout> textureSetLayout{};
+
+            VkDescriptorPool imguiPool = VK_NULL_HANDLE;
     };
 
 } // namespace lot

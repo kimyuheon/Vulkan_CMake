@@ -150,7 +150,7 @@ endif()
 file(GLOB SOURCE_FILES "*.cpp")
 
 add_executable(VulkanApp
-    ${SOURCE_FILES}    
+    ${SOURCE_FILES}
     #main.cpp
     # src/your_vulkan_file.cpp
     # src/your_another_vulkan_file.cpp
@@ -280,6 +280,25 @@ else()
      message(WARNING "GLM include directory not found at ${GLM_INCLUDE_DIR}. Please set GLM_INCLUDE_DIR correctly or install GLM.")
 endif()
 
+### ImGui (OS 무관, 단일 경로)
+set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../imgui")
+
+if(EXISTS "${IMGUI_DIR}/imgui.h")
+    include_directories(${IMGUI_DIR})
+    include_directories(${IMGUI_DIR}/backends)
+
+    target_sources(VulkanApp PRIVATE
+        ${IMGUI_DIR}/imgui.cpp
+        ${IMGUI_DIR}/imgui_draw.cpp
+        ${IMGUI_DIR}/imgui_tables.cpp
+        ${IMGUI_DIR}/imgui_widgets.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_vulkan.cpp
+    )
+    message(STATUS "ImGui found at: ${IMGUI_DIR}")
+else()
+    message(FATAL_ERROR "ImGui not found at: ${IMGUI_DIR}")
+endif()
 
 #---
 

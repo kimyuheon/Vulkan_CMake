@@ -101,6 +101,8 @@ namespace lot {
             globalSetLayout->getDescriptorSetLayout()
         );
 
+        initImGui();
+
         // MaterualManager 초기화
         materialManager = std::make_unique<MaterialManager>(lotDevice);
         materialManager->loadMaterialsFromFolder("textures");
@@ -121,7 +123,50 @@ namespace lot {
     }
 
     FirstApp::~FirstApp() {
-        //vkDeviceWaitIdle(lotDevice.device());
+        cleanupImGui();
+    }
+
+    void FirstApp::initImGui() {
+        // ImGui 전용 descriptor pool
+        VkDescriptorPoolSize pool_size{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 };
+        VkDescriptorPoolCreateInfo pool_info{};
+        pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        pool_info.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+        pool_info.maxSets       = 1;
+        pool_info.poolSizeCount = 1;
+        pool_info.pPoolSizes    = &pool_size;
+        vkCreateDescriptorPool(lotDevice.device(), &pool_info, nullptr, &imguiPool);
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui::StyleColorsDark();
+
+        ImGui_ImplGlfw_InitForVulkan(lotWindow.getGLFWwindow(), true);
+
+        ImGui_ImplVulkan_InitInfo init_info{};
+        init_info.ApiVersion                      = VK_API_VERSION_1_0;
+        init_info.Instance                        = lotDevice.getInstance();
+        init_info.PhysicalDevice                  = lotDevice.getPhysicalDevice();
+        init_info.Device                          = lotDevice.device();
+        init_info.QueueFamily                     = lotDevice.findPhysicalQueueFamilies().graphicsFamily;
+        init_info.Queue                           = lotDevice.graphicsQueue();
+        init_info.DescriptorPool                  = imguiPool;
+        init_info.MinImageCount                   = 2;
+        init_info.ImageCount                      = static_cast<uint32_t>(lotRenderer.getFrameCount());
+        init_info.PipelineInfoMain.RenderPass     = lotRenderer.getSwapChainRenderPass();
+        init_info.PipelineInfoMain.MSAASamples    = VK_SAMPLE_COUNT_1_BIT;
+        ImGui_ImplVulkan_Init(&init_info);
+    }
+
+    void FirstApp::cleanupImGui() {
+        vkDeviceWaitIdle(lotDevice.device());
+        ImGui_ImplVulkan_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+        if (imguiPool != VK_NULL_HANDLE) {
+            vkDestroyDescriptorPool(lotDevice.device(), imguiPool, nullptr);
+            imguiPool = VK_NULL_HANDLE;
+        }
     }
 
     void FirstApp::run() {
@@ -228,7 +273,19 @@ namespace lot {
                     renderSketchPreview(frameInfo);
 
                 pointLightSystem->render(frameInfo);
-                
+
+                // ImGui
+                ImGui_ImplVulkan_NewFrame();
+                ImGui_ImplGlfw_NewFrame();
+                ImGui::NewFrame();
+
+                ImGui::Begin("CAD Engine");
+                ImGui::Text("Objects: %d", (int)gameObjects.size());
+                ImGui::End();
+
+                ImGui::Render();
+                ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
+
                 lotRenderer.endSwapChainRenderPass(commandBuffer);
 
                 lotRenderer.endFrame();
